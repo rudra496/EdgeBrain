@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdgeBrain — AI-Powered Edge Intelligence Platform</title>
+    <meta name="description" content="Autonomous real-world decision systems. 100% local. Zero paid APIs.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #050816;
+            --bg2: #0a0e1a;
+            --bg3: #111827;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --muted: #64748b;
+            --border: #1e293b;
+            --purple: #818cf8;
+            --pink: #f472b6;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --red: #ef4444;
+            --cyan: #06b6d4;
+            --orange: #f97316;
+            --glow: 0 0 60px rgba(129, 140, 248, 0.15);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ── Animated BG ── */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(129,140,248,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(129,140,248,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.07;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow-1 { top: -200px; left: -200px; background: var(--purple); }
+        .bg-glow-2 { bottom: -200px; right: -200px; background: var(--pink); }
+        .bg-glow-3 { top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--cyan); opacity: 0.04; }
+
+        /* ── Layout ── */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+        a { color: var(--purple); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--pink); }
+
+        /* ── Nav ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(5,8,22,0.85);
+            backdrop-filter: blur(16px);
+            z-index: 100;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .nav-brand span { color: var(--purple); }
+
+        .nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--text2); }
+        .nav-links a:hover { color: var(--text); }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 100px 0 80px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 13px;
+            color: var(--text2);
+            margin-bottom: 32px;
+            background: var(--bg2);
+        }
+
+        .hero-badge .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--purple), var(--pink), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text2);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--purple);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(129,140,248,0.3);
+        }
+
+        .btn-primary:hover { background: #6366f1; transform: translateY(-1px); box-shadow: 0 6px 30px rgba(129,140,248,0.4); }
+
+        .btn-secondary {
+            background: var(--bg3);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { border-color: var(--purple); background: var(--bg2); }
+
+        /* ── Code Block ── */
+        .code-block {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 48px auto 0;
+            max-width: 520px;
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text2);
+            position: relative;
+        }
+
+        .code-block .comment { color: var(--muted); }
+        .code-block .cmd { color: var(--green); }
+        .code-block .url { color: var(--cyan); }
+
+        .code-block::before {
+            content: 'Terminal';
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: var(--bg2);
+            padding: 0 8px;
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ── Stats ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 40px 0;
+            margin: 40px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value.purple { color: var(--purple); }
+        .stat-value.pink { color: var(--pink); }
+        .stat-value.green { color: var(--green); }
+        .stat-value.cyan { color: var(--cyan); }
+
+        .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* ── Section ── */
+        .section { padding: 80px 0; }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-sub {
+            font-size: 16px;
+            color: var(--text2);
+            margin-bottom: 48px;
+            max-width: 600px;
+        }
+
+        /* ── Features Grid ── */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(129,140,248,0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+        .feature-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+        /* ── Architecture ── */
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .arch-node {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .arch-node .icon { font-size: 24px; margin-bottom: 8px; }
+        .arch-node .label { font-size: 12px; font-weight: 700; }
+        .arch-node .desc { font-size: 11px; color: var(--muted); }
+
+        .arch-arrow { color: var(--muted); font-size: 20px; }
+
+        /* ── Tech Stack ── */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .tech-item .icon { font-size: 20px; }
+
+        /* ── CTA ── */
+        .cta {
+            text-align: center;
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .cta h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .cta p { color: var(--text2); margin-bottom: 28px; }
+
+        /* ── Footer ── */
+        footer {
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        footer a { color: var(--text2); }
+        footer a:hover { color: var(--purple); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: 1fr; }
+            .arch-flow { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+            .tech-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<div class="container">
+
+    <!-- Nav -->
+    <nav>
+        <div class="nav-brand">
+            🧠 <span>EdgeBrain</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#tech">Tech Stack</a>
+            <a href="https://github.com/rudra496/EdgeBrain" target="_blank">GitHub ↗</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            v1.0.0 — Open Source
+        </div>
+        <h1>
+            AI at the edge,<br>
+            <span class="gradient">not the cloud.</span>
+        </h1>
+        <p>
+            Simulate IoT devices, process real-time data, run AI inference, make autonomous decisions, and control actuators — all on your laptop. Zero paid APIs. Zero cloud.
+        </p>
+        <div class="hero-actions">
+            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank">
+                ⭐ Star on GitHub
+            </a>
+            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank">
+                🚀 Quick Start
+            </a>
+        </div>
+        <div class="code-block">
+            <span class="comment"># Clone & run in under 2 minutes</span><br>
+            <span class="cmd">git clone</span> https://github.com/rudra496/EdgeBrain.git<br>
+            <span class="cmd">cd</span> EdgeBrain<br>
+            <span class="cmd">docker compose up --build -d</span><br>
+            <span class="url"># Open http://localhost:3000 — done.</span>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value purple">11</div>
+            <div class="stat-label">IoT Devices</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value pink">3</div>
+            <div class="stat-label">AI Agents</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value green">37</div>
+            <div class="stat-label">Tests Passing</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value cyan">0</div>
+            <div class="stat-label">Paid APIs</div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <section class="section" id="features">
+        <h2 class="section-title">Everything you need</h2>
+        <p class="section-sub">A complete edge intelligence platform — from sensors to decisions, all running locally.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(129,140,248,0.1);">📡</div>
+                <h3>11 Virtual IoT Devices</h3>
+                <p>Temperature, motion, energy, humidity, light across 3 rooms with realistic patterns.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(244,114,182,0.1);">🤖</div>
+                <h3>Multi-Agent AI</h3>
+                <p>Data Agent → Decision Agent → Action Agent pipeline with message bus.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(34,197,94,0.1);">🧠</div>
+                <h3>Anomaly Detection</h3>
+                <p>3 statistical methods (Z-Score, IQR, Gradient) with multi-vote consensus.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(234,179,8,0.1);">📈</div>
+                <h3>Prediction Engine</h3>
+                <p>Linear regression, SMA, EMA forecasting — CPU only, no training needed.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(6,182,212,0.1);">📊</div>
+                <h3>Real-Time Dashboard</h3>
+                <p>React 18 with live WebSocket charts, 5 pages, dark theme, agent visualization.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(249,115,22,0.1);">🔌</div>
+                <h3>20+ API Endpoints</h3>
+                <p>REST + WebSocket with Pydantic validation, data export (CSV/JSON), predictions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(239,68,68,0.1);">🏗️</div>
+                <h3>Docker Compose</h3>
+                <p>6 services, health checks, one-command setup. PostgreSQL + Redis + Mosquitto.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(139,92,246,0.1);">🔧</div>
+                <h3>Plugin System</h3>
+                <p>Add custom decision strategies via simple Python interface. 10 lines of code.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(52,211,153,0.1);">⚡</div>
+                <h3>ESP32 Support</h3>
+                <p>C++ firmware for real hardware — DHT11, PIR, LED, buzzer via MQTT.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section class="section" id="architecture">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-sub">Sensors stream data via MQTT. AI agents process, decide, and act — all locally.</p>
+
+        <div class="arch-flow">
+            <div class="arch-node" style="border-color: rgba(129,140,248,0.3);">
+                <div class="icon">📡</div>
+                <div class="label">11 Sensors</div>
+                <div class="desc">Temp, Motion, Energy, Humidity, Light</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="border-color: rgba(6,182,212,0.3);">
+                <div class="icon">🐝</div>
+                <div class="label">MQTT Broker</div>
+                <div class="desc">Mosquitto — topic-based routing</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="border-color: rgba(244,114,182,0.3);">
+                <div class="icon">📊</div>
+                <div class="label">Data Agent</div>
+                <div class="desc">Validate + Store</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="border-color: rgba(234,179,8,0.3);">
+                <div class="icon">🧠</div>
+                <div class="label">Decision Agent</div>
+                <div class="desc">Rules + Anomaly + Prediction</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="border-color: rgba(34,197,94,0.3);">
+                <div class="icon">⚡</div>
+                <div class="label">Action Agent</div>
+                <div class="desc">Alerts + Commands</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node" style="border-color: rgba(239,68,68,0.3);">
+                <div class="icon">💡</div>
+                <div class="label">Actuators</div>
+                <div class="desc">Lights, Fans, Alarms</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="section" id="tech">
+        <h2 class="section-title">Tech Stack</h2>
+        <p class="section-sub">Every dependency is free and open-source.</p>
+
+        <div class="tech-grid">
+            <div class="tech-item"><span class="icon">🐍</span> Python 3.11</div>
+            <div class="tech-item"><span class="icon">⚡</span> FastAPI</div>
+            <div class="tech-item"><span class="icon">🐘</span> PostgreSQL 16</div>
+            <div class="tech-item"><span class="icon">🔴</span> Redis 7</div>
+            <div class="tech-item"><span class="icon">🐝</span> Mosquitto MQTT</div>
+            <div class="tech-item"><span class="icon">⚛️</span> React 18</div>
+            <div class="tech-item"><span class="icon">📊</span> Recharts</div>
+            <div class="tech-item"><span class="icon">🔢</span> NumPy + SciPy</div>
+            <div class="tech-item"><span class="icon">🐳</span> Docker Compose</div>
+            <div class="tech-item"><span class="icon">🧪</span> Pytest</div>
+            <div class="tech-item"><span class="icon">🔧</span> ESP32 / Arduino</div>
+            <div class="tech-item"><span class="icon">🔄</span> GitHub Actions CI</div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Ready to get started?</h2>
+        <p>Clone the repo, run one command, and watch AI make decisions in real-time.</p>
+        <div class="hero-actions">
+            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank">
+                View on GitHub →
+            </a>
+            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank">
+                📖 Read the Docs
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            Built with 🔧 by <a href="https://github.com/rudra496">Rudra</a> ·
+            <a href="https://github.com/rudra496/EdgeBrain">GitHub</a> ·
+            <a href="https://github.com/rudra496/EdgeBrain/blob/master/LICENSE">MIT License</a>
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>
