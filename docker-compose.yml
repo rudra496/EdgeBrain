@@ -20,6 +20,8 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redisdata:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -45,6 +47,7 @@ services:
       REDIS_URL: redis://redis:6379/0
       MQTT_HOST: mosquitto
       MQTT_PORT: 1883
+      DEBUG: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +55,7 @@ services:
         condition: service_healthy
       mosquitto:
         condition: service_started
+    restart: unless-stopped
 
   simulator:
     build:
@@ -60,9 +64,11 @@ services:
     environment:
       MQTT_HOST: mosquitto
       MQTT_PORT: 1883
+      SIM_INTERVAL: "2"
     depends_on:
       mosquitto:
         condition: service_started
+    restart: unless-stopped
 
   frontend:
     build:
@@ -70,8 +76,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api/v1
+      REACT_APP_WS_URL: ws://localhost:8000/api/v1/ws
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   pgdata:
+  redisdata:
