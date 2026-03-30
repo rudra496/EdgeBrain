@@ -1,0 +1,46 @@
+# Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv/
+venv/
+*.db
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/build/
+frontend/out/
+
+# Docker
+docker/volumes/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Data
+data/*.csv
+data/*.db
+
+# MQTT
+*.log
+
+# ESP32
+esp32-firmware/build/
+esp32-firmware/sdkconfig
+esp32-firmware/.vscode/
