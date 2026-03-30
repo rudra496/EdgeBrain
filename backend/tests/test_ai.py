@@ -1,5 +1,6 @@
 """EdgeBrain — comprehensive test suite."""
 import math
+import numpy as np
 import pytest
 from app.ai.rules import ThresholdStrategy, NoMotionStrategy, DecisionEngine, Decision
 from app.ai.anomaly import AnomalyDetector
