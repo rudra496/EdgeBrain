@@ -4,85 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EdgeBrain — AI-Powered Edge Intelligence Platform</title>
-    <meta name="description" content="Autonomous real-world decision systems. 100% local. Zero paid APIs.">
+    <meta name="description" content="Autonomous real-world decision systems. 100% local. Zero paid APIs. Simulate IoT devices, run AI inference, and control actuators — all from your laptop.">
+    <meta name="keywords" content="edge computing, IoT, AI, MQTT, smart home, anomaly detection, real-time, edge AI, sensor data">
+    <meta property="og:title" content="EdgeBrain — AI-Powered Edge Intelligence Platform">
+    <meta property="og:description" content="Autonomous real-world decision systems. 100% local. Zero paid APIs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rudra496.github.io/EdgeBrain/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EdgeBrain — AI-Powered Edge Intelligence Platform">
+    <meta name="twitter:description" content="Autonomous real-world decision systems. 100% local. Zero paid APIs.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #050816;
-            --bg2: #0a0e1a;
+            --bg: #030712;
+            --bg2: #0a0f1e;
             --bg3: #111827;
-            --text: #e2e8f0;
-            --text2: #94a3b8;
+            --bg4: #1a2035;
+            --text: #f1f5f9;
+            --text2: #cbd5e1;
+            --text3: #94a3b8;
             --muted: #64748b;
-            --border: #1e293b;
-            --purple: #818cf8;
+            --dim: #475569;
+            --border: rgba(148,163,184,0.08);
+            --border2: rgba(148,163,184,0.15);
+            --purple: #a78bfa;
+            --purple2: #818cf8;
+            --purple3: #6366f1;
             --pink: #f472b6;
-            --green: #22c55e;
-            --yellow: #eab308;
-            --red: #ef4444;
-            --cyan: #06b6d4;
-            --orange: #f97316;
-            --glow: 0 0 60px rgba(129, 140, 248, 0.15);
+            --pink2: #ec4899;
+            --green: #34d399;
+            --green2: #10b981;
+            --yellow: #fbbf24;
+            --red: #f87171;
+            --cyan: #22d3ee;
+            --orange: #fb923c;
+            --blue: #60a5fa;
+            --radius: 14px;
+            --radius2: 20px;
         }
 
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
             line-height: 1.6;
         }
 
-        /* ── Animated BG ── */
+        /* ── Animated Background ── */
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 10%, rgba(99,102,241,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 80%, rgba(236,72,153,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(34,211,238,0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .bg-grid {
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(129,140,248,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(129,140,248,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
+                linear-gradient(rgba(148,163,184,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148,163,184,0.025) 1px, transparent 1px);
+            background-size: 64px 64px;
             pointer-events: none;
             z-index: 0;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 100%);
         }
 
-        .bg-glow {
+        .bg-noise {
             position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.07;
+            inset: 0;
+            opacity: 0.015;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
             pointer-events: none;
             z-index: 0;
         }
 
-        .bg-glow-1 { top: -200px; left: -200px; background: var(--purple); }
-        .bg-glow-2 { bottom: -200px; right: -200px; background: var(--pink); }
-        .bg-glow-3 { top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--cyan); opacity: 0.04; }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
 
-        /* ── Layout ── */
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
-
-        a { color: var(--purple); text-decoration: none; transition: color 0.2s; }
+        a { color: var(--purple); text-decoration: none; transition: all 0.2s; }
         a:hover { color: var(--pink); }
 
-        /* ── Nav ── */
+        /* ── Navigation ── */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border);
+            padding: 18px 0;
             position: sticky;
             top: 0;
-            background: rgba(5,8,22,0.85);
-            backdrop-filter: blur(16px);
-            z-index: 100;
+            z-index: 200;
+            background: rgba(3,7,18,0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
         }
 
         .nav-brand {
@@ -90,65 +115,107 @@
             align-items: center;
             gap: 10px;
             font-weight: 800;
-            font-size: 18px;
+            font-size: 17px;
+            letter-spacing: -0.3px;
         }
 
-        .nav-brand span { color: var(--purple); }
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--purple3), var(--pink2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
 
-        .nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--text2); }
-        .nav-links a:hover { color: var(--text); }
+        .nav-links { display: flex; gap: 6px; }
+
+        .nav-links a {
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text3);
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); background: rgba(148,163,184,0.06); }
+
+        .nav-gh {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            color: var(--text2);
+        }
+
+        .nav-gh:hover { border-color: var(--purple2); color: var(--text); }
 
         /* ── Hero ── */
         .hero {
-            padding: 100px 0 80px;
+            padding: 120px 0 80px;
             text-align: center;
+            position: relative;
         }
 
-        .hero-badge {
+        .hero-eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border: 1px solid var(--border);
+            gap: 10px;
+            padding: 5px 5px 5px 16px;
+            border: 1px solid var(--border2);
             border-radius: 999px;
             font-size: 13px;
-            color: var(--text2);
-            margin-bottom: 32px;
+            color: var(--text3);
+            margin-bottom: 36px;
             background: var(--bg2);
         }
 
-        .hero-badge .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+        .hero-eyebrow .badge {
+            background: var(--purple3);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.3px;
         }
 
         .hero h1 {
-            font-size: clamp(36px, 6vw, 64px);
+            font-size: clamp(40px, 7vw, 72px);
             font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -1.5px;
+            line-height: 1.05;
+            margin-bottom: 28px;
+            letter-spacing: -2px;
         }
 
-        .hero h1 .gradient {
-            background: linear-gradient(135deg, var(--purple), var(--pink), var(--cyan));
+        .hero h1 .line2 {
+            display: block;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 50%, var(--cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
         }
 
-        .hero p {
-            font-size: 18px;
-            color: var(--text2);
-            max-width: 600px;
-            margin: 0 auto 40px;
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-desc {
+            font-size: 19px;
+            color: var(--text3);
+            max-width: 640px;
+            margin: 0 auto 44px;
             line-height: 1.7;
         }
 
@@ -157,116 +224,212 @@
             justify-content: center;
             gap: 14px;
             flex-wrap: wrap;
+            margin-bottom: 56px;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 28px;
+            padding: 13px 28px;
             border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s;
             font-family: inherit;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
-            background: var(--purple);
+            background: linear-gradient(135deg, var(--purple3), var(--purple));
             color: #fff;
-            box-shadow: 0 4px 20px rgba(129,140,248,0.3);
+            box-shadow: 0 4px 24px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        .btn-primary:hover { background: #6366f1; transform: translateY(-1px); box-shadow: 0 6px 30px rgba(129,140,248,0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.1); }
 
         .btn-secondary {
             background: var(--bg3);
-            color: var(--text);
-            border: 1px solid var(--border);
+            color: var(--text2);
+            border: 1px solid var(--border2);
         }
 
-        .btn-secondary:hover { border-color: var(--purple); background: var(--bg2); }
+        .btn-secondary:hover { border-color: var(--purple2); color: var(--text); transform: translateY(-1px); }
+
+        .btn svg { width: 16px; height: 16px; fill: currentColor; }
 
         /* ── Code Block ── */
         .code-block {
             background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin: 48px auto 0;
-            max-width: 520px;
+            border: 1px solid var(--border2);
+            border-radius: var(--radius2);
+            padding: 24px 28px;
+            max-width: 560px;
+            margin: 0 auto;
             text-align: left;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            line-height: 1.8;
-            color: var(--text2);
+            line-height: 2;
+            color: var(--text3);
             position: relative;
+            overflow: hidden;
         }
-
-        .code-block .comment { color: var(--muted); }
-        .code-block .cmd { color: var(--green); }
-        .code-block .url { color: var(--cyan); }
 
         .code-block::before {
-            content: 'Terminal';
+            content: '';
             position: absolute;
-            top: -10px;
-            left: 16px;
-            background: var(--bg2);
-            padding: 0 8px;
-            font-size: 11px;
-            color: var(--muted);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* ── Stats ── */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            padding: 40px 0;
-            margin: 40px 0;
-            border-top: 1px solid var(--border);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: var(--bg3);
             border-bottom: 1px solid var(--border);
         }
 
-        .stat {
+        .code-dots {
+            display: flex;
+            gap: 7px;
+            padding: 10px 0 0 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .code-dots span {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .code-dots span:nth-child(1) { background: #ef4444; }
+        .code-dots span:nth-child(2) { background: #f59e0b; }
+        .code-dots span:nth-child(3) { background: #22c55e; }
+
+        .code-body { padding-top: 8px; position: relative; z-index: 2; }
+        .code-comment { color: var(--dim); }
+        .code-cmd { color: var(--green); }
+        .code-url { color: var(--cyan); }
+        .code-output { color: var(--yellow); }
+
+        /* ── Trusted By ── */
+        .trust {
+            padding: 48px 0;
             text-align: center;
         }
 
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
+        .trust-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
         }
 
-        .stat-value.purple { color: var(--purple); }
-        .stat-value.pink { color: var(--pink); }
-        .stat-value.green { color: var(--green); }
-        .stat-value.cyan { color: var(--cyan); }
+        .trust-stack {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            opacity: 0.4;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text3);
+        }
 
-        .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .trust-stack span { display: flex; align-items: center; gap: 8px; }
+
+        /* ── Stats Row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius2);
+            overflow: hidden;
+            margin: 16px 0 80px;
+        }
+
+        .stat-item {
+            background: var(--bg2);
+            padding: 32px 20px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .stat-item:hover { background: var(--bg3); }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .stat-item:nth-child(1) .stat-number { color: var(--purple); }
+        .stat-item:nth-child(2) .stat-number { color: var(--pink); }
+        .stat-item:nth-child(3) .stat-number { color: var(--green); }
+        .stat-item:nth-child(4) .stat-number { color: var(--cyan); }
+        .stat-item:nth-child(5) .stat-number { color: var(--yellow); }
+
+        .stat-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
 
         /* ── Section ── */
         .section { padding: 80px 0; }
 
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: var(--purple3);
+            border-radius: 2px;
+        }
+
         .section-title {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+            line-height: 1.15;
         }
 
-        .section-sub {
-            font-size: 16px;
-            color: var(--text2);
+        .section-desc {
+            font-size: 17px;
+            color: var(--text3);
+            max-width: 560px;
+            line-height: 1.7;
             margin-bottom: 48px;
-            max-width: 600px;
         }
 
-        /* ── Features Grid ── */
+        .section-center { text-align: center; }
+        .section-center .section-desc { margin-left: auto; margin-right: auto; }
+
+        /* ── Feature Cards ── */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -276,329 +439,698 @@
         .feature-card {
             background: var(--bg2);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 28px;
+            border-radius: var(--radius2);
+            padding: 32px 28px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius2);
+            opacity: 0;
+            transition: opacity 0.35s;
+            background: radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(129,140,248,0.06), transparent 60%);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+
+        .feature-card > * { position: relative; z-index: 1; }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.2px; }
+        .feature-card p { font-size: 14px; color: var(--text3); line-height: 1.65; }
+
+        /* ── Architecture ── */
+        .arch-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+        .arch-pipeline {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            margin: 48px 0;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .arch-step {
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+            padding: 28px 20px 20px;
+            position: relative;
+            border-right: 1px dashed var(--border2);
+        }
+
+        .arch-step:last-child { border-right: none; }
+
+        .arch-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .arch-step:nth-child(1) .arch-step-num { background: rgba(129,140,248,0.15); color: var(--purple); }
+        .arch-step:nth-child(2) .arch-step-num { background: rgba(6,182,212,0.15); color: var(--cyan); }
+        .arch-step:nth-child(3) .arch-step-num { background: rgba(244,114,182,0.15); color: var(--pink); }
+        .arch-step:nth-child(4) .arch-step-num { background: rgba(251,191,36,0.15); color: var(--yellow); }
+        .arch-step:nth-child(5) .arch-step-num { background: rgba(34,211,153,0.15); color: var(--green); }
+        .arch-step:nth-child(6) .arch-step-num { background: rgba(248,113,113,0.15); color: var(--red); }
+        .arch-step:nth-child(7) .arch-step-num { background: rgba(96,165,250,0.15); color: var(--blue); }
+
+        .arch-step-icon { font-size: 28px; margin-bottom: 10px; }
+
+        .arch-step h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+
+        .arch-step p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+        .arch-arrow-down {
+            display: none;
+        }
+
+        /* ── Demos ── */
+        .demos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .demo-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius2);
+            padding: 32px 28px;
             transition: all 0.3s;
         }
 
-        .feature-card:hover {
-            border-color: rgba(129,140,248,0.3);
-            transform: translateY(-2px);
-            box-shadow: var(--glow);
-        }
+        .demo-card:hover { border-color: var(--border2); transform: translateY(-2px); }
 
-        .feature-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+        .demo-card-icon {
+            font-size: 36px;
             margin-bottom: 16px;
         }
 
-        .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-        .feature-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+        .demo-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .demo-card p { font-size: 14px; color: var(--text3); margin-bottom: 18px; line-height: 1.6; }
 
-        /* ── Architecture ── */
-        .arch-flow {
+        .demo-triggers {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 40px 0;
             flex-wrap: wrap;
+            gap: 6px;
         }
 
-        .arch-node {
-            background: var(--bg2);
+        .demo-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--bg3);
+            color: var(--text3);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 24px;
-            text-align: center;
-            min-width: 120px;
         }
-
-        .arch-node .icon { font-size: 24px; margin-bottom: 8px; }
-        .arch-node .label { font-size: 12px; font-weight: 700; }
-        .arch-node .desc { font-size: 11px; color: var(--muted); }
-
-        .arch-arrow { color: var(--muted); font-size: 20px; }
 
         /* ── Tech Stack ── */
         .tech-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
         }
 
         .tech-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             background: var(--bg2);
             border: 1px solid var(--border);
             border-radius: 10px;
             font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
-        .tech-item .icon { font-size: 20px; }
+        .tech-item:hover { border-color: var(--border2); background: var(--bg3); }
+
+        .tech-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Comparison ── */
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius2);
+            overflow: hidden;
+        }
+
+        .compare-table th {
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare-table td {
+            padding: 14px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare-table tr:last-child td { border-bottom: none; }
+
+        .compare-table .highlight {
+            background: rgba(99,102,241,0.06);
+        }
+
+        .compare-table .highlight td:first-child {
+            font-weight: 700;
+            color: var(--purple);
+        }
+
+        .check { color: var(--green); font-weight: 700; }
+        .cross { color: var(--dim); }
 
         /* ── CTA ── */
-        .cta {
+        .cta-section {
             text-align: center;
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
+            padding: 100px 0;
+            position: relative;
         }
 
-        .cta h2 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 12px;
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 70%);
+            pointer-events: none;
         }
 
-        .cta p { color: var(--text2); margin-bottom: 28px; }
+        .cta-section h2 {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            color: var(--text3);
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        .cta-actions { position: relative; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
 
         /* ── Footer ── */
         footer {
-            padding: 24px 0;
+            padding: 32px 0;
             border-top: 1px solid var(--border);
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 13px;
-            color: var(--muted);
+            color: var(--dim);
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        footer a { color: var(--text2); }
+        footer a { color: var(--text3); }
         footer a:hover { color: var(--purple); }
 
+        .footer-links { display: flex; gap: 24px; }
+
+        /* ── Scroll animations ── */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* ── Responsive ── */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
-            .stats { grid-template-columns: repeat(2, 1fr); }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .stats-row .stat-item:nth-child(n+4) { display: none; }
             .features-grid { grid-template-columns: 1fr; }
-            .arch-flow { flex-direction: column; }
-            .arch-arrow { transform: rotate(90deg); }
+            .demos-grid { grid-template-columns: 1fr; }
             .tech-grid { grid-template-columns: 1fr 1fr; }
+            .arch-pipeline { flex-direction: column; gap: 0; }
+            .arch-step { border-right: none; border-bottom: 1px dashed var(--border2); }
+            .compare-table { font-size: 13px; }
+            .compare-table th, .compare-table td { padding: 10px 12px; }
+        }
+
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .stats-row .stat-item:nth-child(3) { display: none; }
+            .hero { padding: 80px 0 50px; }
+            .section { padding: 50px 0; }
+            footer { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
 
+<div class="bg-mesh"></div>
 <div class="bg-grid"></div>
-<div class="bg-glow bg-glow-1"></div>
-<div class="bg-glow bg-glow-2"></div>
-<div class="bg-glow bg-glow-3"></div>
+<div class="bg-noise"></div>
 
 <div class="container">
 
-    <!-- Nav -->
+    <!-- Navigation -->
     <nav>
         <div class="nav-brand">
-            🧠 <span>EdgeBrain</span>
+            <div class="nav-logo">🧠</div>
+            EdgeBrain
         </div>
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="#architecture">Architecture</a>
-            <a href="#tech">Tech Stack</a>
-            <a href="https://github.com/rudra496/EdgeBrain" target="_blank">GitHub ↗</a>
+            <a href="#demos">Demos</a>
+            <a href="#tech">Stack</a>
+            <a href="#compare">Compare</a>
         </div>
+        <a href="https://github.com/rudra496/EdgeBrain" class="nav-gh" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+        </a>
     </nav>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-badge">
-            <span class="dot"></span>
-            v1.0.0 — Open Source
+        <div class="hero-eyebrow">
+            <span class="badge">v1.0.0</span>
+            100% Free · Open Source · MIT License
         </div>
+
         <h1>
-            AI at the edge,<br>
-            <span class="gradient">not the cloud.</span>
+            The brain for<br>
+            <span class="line2">physical spaces</span>
         </h1>
-        <p>
-            Simulate IoT devices, process real-time data, run AI inference, make autonomous decisions, and control actuators — all on your laptop. Zero paid APIs. Zero cloud.
+
+        <p class="hero-desc">
+            Simulate IoT devices, process real-time data streams, run AI inference on CPU, make autonomous decisions, and control actuators — all locally, all free.
         </p>
+
         <div class="hero-actions">
-            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank">
-                ⭐ Star on GitHub
+            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.751.751 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+                Star on GitHub
             </a>
-            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank">
-                🚀 Quick Start
+            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank" rel="noopener">
+                🚀 Quick Start Guide
+            </a>
+            <a href="https://rudra496.github.io/EdgeBrain/" class="btn btn-secondary" target="_blank" rel="noopener">
+                📖 Full Documentation
             </a>
         </div>
+
         <div class="code-block">
-            <span class="comment"># Clone & run in under 2 minutes</span><br>
-            <span class="cmd">git clone</span> https://github.com/rudra496/EdgeBrain.git<br>
-            <span class="cmd">cd</span> EdgeBrain<br>
-            <span class="cmd">docker compose up --build -d</span><br>
-            <span class="url"># Open http://localhost:3000 — done.</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+            <div class="code-body">
+                <span class="code-comment"># Clone & run in under 2 minutes</span><br>
+                <span class="code-cmd">git clone</span> <span class="code-url">https://github.com/rudra496/EdgeBrain.git</span><br>
+                <span class="code-cmd">cd</span> EdgeBrain<br>
+                <span class="code-cmd">docker compose up</span> --build -d<br>
+                <span class="code-output"># ✅ Open http://localhost:3000 — done.</span>
+            </div>
         </div>
     </section>
 
     <!-- Stats -->
-    <div class="stats">
-        <div class="stat">
-            <div class="stat-value purple">11</div>
-            <div class="stat-label">IoT Devices</div>
+    <div class="stats-row fade-in">
+        <div class="stat-item">
+            <div class="stat-number">11</div>
+            <div class="stat-desc">IoT Devices</div>
         </div>
-        <div class="stat">
-            <div class="stat-value pink">3</div>
-            <div class="stat-label">AI Agents</div>
+        <div class="stat-item">
+            <div class="stat-number">3</div>
+            <div class="stat-desc">AI Agents</div>
         </div>
-        <div class="stat">
-            <div class="stat-value green">37</div>
-            <div class="stat-label">Tests Passing</div>
+        <div class="stat-item">
+            <div class="stat-number">20+</div>
+            <div class="stat-desc">API Endpoints</div>
         </div>
-        <div class="stat">
-            <div class="stat-value cyan">0</div>
-            <div class="stat-label">Paid APIs</div>
+        <div class="stat-item">
+            <div class="stat-number">37</div>
+            <div class="stat-desc">Tests Passing</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">$0</div>
+            <div class="stat-desc">Cost to Run</div>
         </div>
     </div>
 
     <!-- Features -->
-    <section class="section" id="features">
-        <h2 class="section-title">Everything you need</h2>
-        <p class="section-sub">A complete edge intelligence platform — from sensors to decisions, all running locally.</p>
+    <section class="section section-center" id="features">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+        <p class="section-desc">
+            A complete edge intelligence platform — from simulated sensors to autonomous decisions — with zero external dependencies.
+        </p>
 
-        <div class="features-grid">
+        <div class="features-grid" style="text-align:left;">
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(129,140,248,0.1);">📡</div>
-                <h3>11 Virtual IoT Devices</h3>
-                <p>Temperature, motion, energy, humidity, light across 3 rooms with realistic patterns.</p>
+                <div class="feature-icon" style="background:rgba(129,140,248,0.08);">📡</div>
+                <h3>Smart Device Simulation</h3>
+                <p>11 virtual IoT devices across 3 rooms with realistic circadian patterns, Gaussian noise, and rare event simulation. Temperature, motion, energy, humidity, and light.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(244,114,182,0.1);">🤖</div>
-                <h3>Multi-Agent AI</h3>
-                <p>Data Agent → Decision Agent → Action Agent pipeline with message bus.</p>
+                <div class="feature-icon" style="background:rgba(244,114,182,0.08);">🤖</div>
+                <h3>Multi-Agent AI System</h3>
+                <p>Data Agent validates and stores. Decision Agent evaluates strategies. Action Agent executes commands. Full message bus with performance tracking.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(34,197,94,0.1);">🧠</div>
+                <div class="feature-icon" style="background:rgba(34,211,238,0.08);">🧠</div>
                 <h3>Anomaly Detection</h3>
-                <p>3 statistical methods (Z-Score, IQR, Gradient) with multi-vote consensus.</p>
+                <p>Three statistical methods — Z-Score, IQR, and Gradient — vote on anomalies. Requires 2+ methods to agree, reducing false positives by ~70%.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(234,179,8,0.1);">📈</div>
+                <div class="feature-icon" style="background:rgba(251,191,36,0.08);">📈</div>
                 <h3>Prediction Engine</h3>
-                <p>Linear regression, SMA, EMA forecasting — CPU only, no training needed.</p>
+                <p>Linear regression, Simple Moving Average, and Exponential Moving Average forecasting. Multi-step predictions with confidence scores. CPU only.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(6,182,212,0.1);">📊</div>
+                <div class="feature-icon" style="background:rgba(34,211,153,0.08);">📊</div>
                 <h3>Real-Time Dashboard</h3>
-                <p>React 18 with live WebSocket charts, 5 pages, dark theme, agent visualization.</p>
+                <p>React 18 with WebSocket-powered live charts, 5 navigable pages, agent pipeline visualization, and a polished dark theme design system.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(249,115,22,0.1);">🔌</div>
-                <h3>20+ API Endpoints</h3>
-                <p>REST + WebSocket with Pydantic validation, data export (CSV/JSON), predictions.</p>
+                <div class="feature-icon" style="background:rgba(96,165,250,0.08);">🔌</div>
+                <h3>REST + WebSocket API</h3>
+                <p>20+ endpoints with Pydantic validation, auto-generated Swagger docs, CSV/JSON data export, device predictions, and bidirectional WebSocket.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(239,68,68,0.1);">🏗️</div>
-                <h3>Docker Compose</h3>
-                <p>6 services, health checks, one-command setup. PostgreSQL + Redis + Mosquitto.</p>
+                <div class="feature-icon" style="background:rgba(248,113,113,0.08);">📏</div>
+                <h3>Rule Engine + Hysteresis</h3>
+                <p>Configurable threshold triggers with hysteresis to prevent actuator flapping. No-motion timeout automatically turns off unused lights.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(139,92,246,0.1);">🔧</div>
-                <h3>Plugin System</h3>
-                <p>Add custom decision strategies via simple Python interface. 10 lines of code.</p>
+                <div class="feature-icon" style="background:rgba(236,72,153,0.08);">🧩</div>
+                <h3>Plugin Architecture</h3>
+                <p>Add custom decision strategies with 10 lines of Python. Just implement <code>evaluate()</code> and <code>name</code> — the engine handles the rest.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon" style="background: rgba(52,211,153,0.1);">⚡</div>
-                <h3>ESP32 Support</h3>
-                <p>C++ firmware for real hardware — DHT11, PIR, LED, buzzer via MQTT.</p>
+                <div class="feature-icon" style="background:rgba(52,211,153,0.08);">⚡</div>
+                <h3>ESP32 Hardware Support</h3>
+                <p>C++ Arduino firmware for real DHT11 temperature and PIR motion sensors. LED and buzzer actuator control. WiFi + MQTT.</p>
             </div>
         </div>
     </section>
 
     <!-- Architecture -->
-    <section class="section" id="architecture">
-        <h2 class="section-title">How it works</h2>
-        <p class="section-sub">Sensors stream data via MQTT. AI agents process, decide, and act — all locally.</p>
+    <section class="arch-section section" id="architecture">
+        <div class="container">
+            <div class="section-label">Architecture</div>
+            <h2 class="section-title">From sensor to action, locally.</h2>
+            <p class="section-desc">
+                An event-driven pipeline that never leaves your machine. Every component is modular, testable, and replaceable.
+            </p>
 
-        <div class="arch-flow">
-            <div class="arch-node" style="border-color: rgba(129,140,248,0.3);">
-                <div class="icon">📡</div>
-                <div class="label">11 Sensors</div>
-                <div class="desc">Temp, Motion, Energy, Humidity, Light</div>
+            <div class="arch-pipeline">
+                <div class="arch-step">
+                    <div class="arch-step-num">1</div>
+                    <div class="arch-step-icon">📡</div>
+                    <h4>IoT Sensors</h4>
+                    <p>11 devices across 3 rooms streaming via MQTT</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">2</div>
+                    <div class="arch-step-icon">🐝</div>
+                    <h4>MQTT Broker</h4>
+                    <p>Mosquitto topic-based routing and pub/sub</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">3</div>
+                    <div class="arch-step-icon">📊</div>
+                    <h4>Data Agent</h4>
+                    <p>Validate ranges, store in PostgreSQL</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">4</div>
+                    <div class="arch-step-icon">🧠</div>
+                    <h4>Decision Agent</h4>
+                    <p>Rules + anomaly + prediction evaluation</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">5</div>
+                    <div class="arch-step-icon">⚡</div>
+                    <h4>Action Agent</h4>
+                    <p>Create alerts, send MQTT commands</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">6</div>
+                    <div class="arch-step-icon">💡</div>
+                    <h4>Actuators</h4>
+                    <p>Lights, fans, alarms respond in real-time</p>
+                </div>
+                <div class="arch-step">
+                    <div class="arch-step-num">7</div>
+                    <div class="arch-step-icon">🖥️</div>
+                    <h4>Dashboard</h4>
+                    <p>Live WebSocket charts and controls</p>
+                </div>
             </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node" style="border-color: rgba(6,182,212,0.3);">
-                <div class="icon">🐝</div>
-                <div class="label">MQTT Broker</div>
-                <div class="desc">Mosquitto — topic-based routing</div>
+        </div>
+    </section>
+
+    <!-- Demos -->
+    <section class="section section-center" id="demos">
+        <div class="section-label">Live Demos</div>
+        <h2 class="section-title">See it in action</h2>
+        <p class="section-desc">
+            Three complete demos run automatically when you start the system. Watch AI make decisions in real-time.
+        </p>
+
+        <div class="demos-grid" style="text-align:left;">
+            <div class="demo-card">
+                <div class="demo-card-icon">🏠</div>
+                <h3>Smart Room Automation</h3>
+                <p>Intelligent room control that adapts to occupancy and environment conditions without any human input.</p>
+                <div class="demo-triggers">
+                    <span class="demo-tag">Motion → Lights ON</span>
+                    <span class="demo-tag">5 min idle → Lights OFF</span>
+                    <span class="demo-tag">Temp > 30°C → Fan ON</span>
+                    <span class="demo-tag">Temp < 25°C → Fan OFF</span>
+                </div>
             </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node" style="border-color: rgba(244,114,182,0.3);">
-                <div class="icon">📊</div>
-                <div class="label">Data Agent</div>
-                <div class="desc">Validate + Store</div>
+            <div class="demo-card">
+                <div class="demo-card-icon">🌡️</div>
+                <h3>Anomaly Detection</h3>
+                <p>Statistical monitoring that catches equipment anomalies before they become critical failures.</p>
+                <div class="demo-triggers">
+                    <span class="demo-tag">Z-Score Analysis</span>
+                    <span class="demo-tag">IQR Method</span>
+                    <span class="demo-tag">Gradient Detection</span>
+                    <span class="demo-tag">Multi-vote Consensus</span>
+                </div>
             </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node" style="border-color: rgba(234,179,8,0.3);">
-                <div class="icon">🧠</div>
-                <div class="label">Decision Agent</div>
-                <div class="desc">Rules + Anomaly + Prediction</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node" style="border-color: rgba(34,197,94,0.3);">
-                <div class="icon">⚡</div>
-                <div class="label">Action Agent</div>
-                <div class="desc">Alerts + Commands</div>
-            </div>
-            <div class="arch-arrow">→</div>
-            <div class="arch-node" style="border-color: rgba(239,68,68,0.3);">
-                <div class="icon">💡</div>
-                <div class="label">Actuators</div>
-                <div class="desc">Lights, Fans, Alarms</div>
+            <div class="demo-card">
+                <div class="demo-card-icon">⚡</div>
+                <h3>Energy Monitoring</h3>
+                <p>Continuous consumption tracking with time-of-day awareness, spike detection, and trend forecasting.</p>
+                <div class="demo-triggers">
+                    <span class="demo-tag">Usage Patterns</span>
+                    <span class="demo-tag">Spike Detection</span>
+                    <span class="demo-tag">Trend Forecasting</span>
+                    <span class="demo-tag">Export CSV/JSON</span>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Tech Stack -->
     <section class="section" id="tech">
-        <h2 class="section-title">Tech Stack</h2>
-        <p class="section-sub">Every dependency is free and open-source.</p>
+        <div class="section-label">Tech Stack</div>
+        <h2 class="section-title">Built with the best tools</h2>
+        <p class="section-desc">Every dependency is free, open-source, and battle-tested in production.</p>
 
         <div class="tech-grid">
-            <div class="tech-item"><span class="icon">🐍</span> Python 3.11</div>
-            <div class="tech-item"><span class="icon">⚡</span> FastAPI</div>
-            <div class="tech-item"><span class="icon">🐘</span> PostgreSQL 16</div>
-            <div class="tech-item"><span class="icon">🔴</span> Redis 7</div>
-            <div class="tech-item"><span class="icon">🐝</span> Mosquitto MQTT</div>
-            <div class="tech-item"><span class="icon">⚛️</span> React 18</div>
-            <div class="tech-item"><span class="icon">📊</span> Recharts</div>
-            <div class="tech-item"><span class="icon">🔢</span> NumPy + SciPy</div>
-            <div class="tech-item"><span class="icon">🐳</span> Docker Compose</div>
-            <div class="tech-item"><span class="icon">🧪</span> Pytest</div>
-            <div class="tech-item"><span class="icon">🔧</span> ESP32 / Arduino</div>
-            <div class="tech-item"><span class="icon">🔄</span> GitHub Actions CI</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#3776AB;"></span> Python 3.11+</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#009688;"></span> FastAPI</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#4169E1;"></span> PostgreSQL 16</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#DC382D;"></span> Redis 7</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#6C0094;"></span> Mosquitto MQTT</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#61DAFB;"></span> React 18</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#1E77B3;"></span> Recharts</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#9B59B6;"></span> NumPy + SciPy</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#2496ED;"></span> Docker Compose</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#32C850;"></span> Pytest</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#E34F26;"></span> ESP32 / Arduino</div>
+            <div class="tech-item"><span class="tech-dot" style="background:#2088FF;"></span> GitHub Actions</div>
+        </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="section section-center" id="compare">
+        <div class="section-label">Why EdgeBrain</div>
+        <h2 class="section-title">No cloud required</h2>
+        <p class="section-desc">Unlike IoT cloud platforms, EdgeBrain runs entirely on your machine. Your data never leaves your laptop.</p>
+
+        <div style="max-width:700px;margin:0 auto;">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>EdgeBrain</th>
+                        <th>Typical IoT Cloud</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight">
+                        <td>Cost</td>
+                        <td><span class="check">$0 forever</span></td>
+                        <td><span class="cross">$10–500+/mo</span></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td>Data Privacy</td>
+                        <td><span class="check">100% local</span></td>
+                        <td><span class="cross">Cloud-stored</span></td>
+                    </tr>
+                    <tr>
+                        <td>Setup Time</td>
+                        <td><span class="check">~2 minutes</span></td>
+                        <td><span class="cross">Hours to days</span></td>
+                    </tr>
+                    <tr>
+                        <td>AI Inference</td>
+                        <td><span class="check">Built-in (CPU)</span></td>
+                        <td>Varies / extra cost</td>
+                    </tr>
+                    <tr>
+                        <td>Custom Strategies</td>
+                        <td><span class="check">Python plugin system</span></td>
+                        <td><span class="cross">Limited / locked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Hardware Support</td>
+                        <td><span class="check">ESP32 included</span></td>
+                        <td>Vendor-specific</td>
+                    </tr>
+                    <tr>
+                        <td>Internet Required</td>
+                        <td><span class="check">No</span></td>
+                        <td><span class="cross">Always</span></td>
+                    </tr>
+                    <tr>
+                        <td>Open Source</td>
+                        <td><span class="check">MIT License</span></td>
+                        <td><span class="cross">Proprietary</span></td>
+                    </tr>
+                    <tr>
+                        <td>Latency</td>
+                        <td><span class="check">&lt; 5ms (local)</span></td>
+                        <td>100–500ms (cloud)</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta">
-        <h2>Ready to get started?</h2>
-        <p>Clone the repo, run one command, and watch AI make decisions in real-time.</p>
-        <div class="hero-actions">
-            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank">
+    <section class="cta-section">
+        <h2>Ready to put a brain<br>on your edge?</h2>
+        <p>One command. Zero cost. Full control.</p>
+        <div class="cta-actions">
+            <a href="https://github.com/rudra496/EdgeBrain" class="btn btn-primary" target="_blank" rel="noopener">
                 View on GitHub →
             </a>
-            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank">
-                📖 Read the Docs
+            <a href="https://github.com/rudra496/EdgeBrain#-quick-start" class="btn btn-secondary" target="_blank" rel="noopener">
+                Quick Start Guide
             </a>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>
-            Built with 🔧 by <a href="https://github.com/rudra496">Rudra</a> ·
-            <a href="https://github.com/rudra496/EdgeBrain">GitHub</a> ·
-            <a href="https://github.com/rudra496/EdgeBrain/blob/master/LICENSE">MIT License</a>
-        </p>
+        <div>
+            Built with 🔧 by <a href="https://github.com/rudra496" target="_blank">Rudra</a>
+        </div>
+        <div class="footer-links">
+            <a href="https://github.com/rudra496/EdgeBrain" target="_blank">GitHub</a>
+            <a href="https://github.com/rudra496/EdgeBrain/releases" target="_blank">Releases</a>
+            <a href="https://github.com/rudra496/EdgeBrain/blob/master/LICENSE" target="_blank">MIT License</a>
+            <a href="https://github.com/rudra496/EdgeBrain/issues" target="_blank">Issues</a>
+        </div>
     </footer>
 
 </div>
+
+<script>
+// Scroll reveal animation
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// Mouse glow effect on feature cards
+document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', x + 'px');
+        card.style.setProperty('--mouse-y', y + 'px');
+    });
+});
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+</script>
 
 </body>
 </html>
