@@ -1,0 +1,46 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement
+labels: [enhancement]
+assignees: []
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: What would you like?
+      placeholder: "I would love EdgeBrain to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this needed?
+      placeholder: "This would help because..."
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      placeholder: "How could this be implemented?"
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      placeholder: "Other approaches you've thought of"
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - AI / Decision Engine
+        - Backend / API
+        - Frontend / Dashboard
+        - Device Simulation
+        - Hardware / ESP32
+        - Documentation
+        - DevOps / Docker
+        - Other

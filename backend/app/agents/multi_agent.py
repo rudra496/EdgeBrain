@@ -6,6 +6,7 @@ from typing import Any
 
 from app.ai.rules import Decision, DecisionEngine, ThresholdStrategy, NoMotionStrategy
 from app.ai.anomaly import AnomalyDetector
+from app.ai.prediction import predictor
 from app.services.ingestion import data_ingestion
 from app.services.execution import execution_service, alert_service
 from app.core.events import event_queue
@@ -136,7 +137,7 @@ class MultiAgentSystem:
 
         # Create alert for warning/critical
         if decision.severity in ("warning", "critical"):
-            alert = alert_service.create_alert(
+            alert_service.create_alert(
                 device_id=decision.device_id,
                 alert_type=f"{decision.action}_{decision.params.get('actuator', '')}",
                 severity=decision.severity,
