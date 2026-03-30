@@ -19,7 +19,7 @@
 **Simulate → Process → Decide → Act — all locally, all free.**
 
 [![CI](https://img.shields.io/github/actions/workflow/status/rudra496/EdgeBrain/ci.yml?branch=master&style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/actions)
-[![Release](https://img.shields.io/github/v/release/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/releases)
+[![Release](https://img.shields.io/github/v/release/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/releases/latest)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 [![Docker Pulls](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://hub.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python)](https://python.org)
@@ -470,7 +470,7 @@ We ❤️ contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```bash
 # Fork, branch, code, PR
-git clone https://github.com/YOUR_USERNAME/EdgeBrain.git
+git clone https://github.com/rudra496/EdgeBrain.git
 cd EdgeBrain
 make dev      # Start development environment
 make test     # Run tests
@@ -479,10 +479,9 @@ make test     # Run tests
 
 ### Contributors
 
-<!-- Thanks to all contributors! -->
-<a href="https://github.com/rudra496/EdgeBrain/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=rudra496/EdgeBrain" />
-</a>
+Thanks to all contributors! Your PRs make EdgeBrain better.
+
+[![Contributors](https://contrib.rocks/image?repo=rudra496/EdgeBrain)](https://github.com/rudra496/EdgeBrain/graphs/contributors)
 
 ---
 
