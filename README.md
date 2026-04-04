@@ -46,6 +46,8 @@
 
 ## 🎬 Demo
 
+![EdgeBrain Dashboard Demo](https://img.shields.io/badge/🎬_Dashboard_Screenshot-Coming_Soon-8b5cf6?style=for-the-badge)
+
 ```bash
 # Clone & run in under 2 minutes
 git clone https://github.com/rudra496/EdgeBrain.git && cd EdgeBrain
