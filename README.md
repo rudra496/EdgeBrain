@@ -2,7 +2,7 @@
 #  🧠 EdgeBrain — AI-Powered Edge Intelligence Platform
 # ──────────────────────────────────────────────────────────────
 #
-#  Autonomous real-world decision systems. 100% local. Zero paid APIs.
+#  Autonomous real-world decision systems. Runs locally. No paid APIs required.
 #
 #  https://github.com/rudra496/EdgeBrain
 #
@@ -14,7 +14,7 @@
 
 <br /><br />
 
-**The most comprehensive open-source edge AI platform.**
+**A comprehensive open-source edge AI platform.**
 
 **Simulate → Process → Decide → Act — all locally, all free.**
 
@@ -31,7 +31,7 @@
 [![Stars](https://img.shields.io/github/stars/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/stargazers)
 [![Forks](https://img.shields.io/github/forks/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/network/members)
 [![Issues](https://img.shields.io/github/issues/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/issues)
-[![100% Free](https://img.shields.io/badge/✓-100%25_Free-success?style=flat-square)]()
+[![Free & Open Source](https://img.shields.io/badge/✓-Free_&_Open_Source-success?style=flat-square)]()
 [![No Cloud](https://img.shields.io/badge/✓-No_Cloud_Required-success?style=flat-square)]()
 [![Local First](https://img.shields.io/badge/✓-Local_First-success?style=flat-square)]()
 [![Privacy](https://img.shields.io/badge/✓-Privacy_First-success?style=flat-square)]()
