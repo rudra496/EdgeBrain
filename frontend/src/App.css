@@ -533,20 +533,202 @@
   font-size: 13px;
 }
 
+/* ─── Mobile Menu Button ──────────────────────────────────── */
+
+.mobile-menu-btn {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 90;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-close-mobile {
+  display: none;
+  position: absolute;
+  top: 16px;
+  right: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+}
+
+.sidebar-close-mobile:hover { color: var(--text-primary); background: var(--bg-card); }
+
+/* ─── Gauge Widgets ───────────────────────────────────────── */
+
+.gauges-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 0 28px 24px;
+}
+
+.gauge-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.gauge-widget:hover { border-color: var(--border-light); transform: translateY(-1px); }
+
+.gauge-header {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.gauge-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.gauge-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.gauge-value {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: -8px;
+}
+
+.gauge-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.gauge-range {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 /* ─── Responsive ──────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
-  .sidebar { width: 60px; }
+  .sidebar {
+    width: 60px;
+  }
   .sidebar-title, .sidebar-sub, .sidebar-btn span, .sidebar-footer span { display: none; }
   .sidebar-brand { padding: 16px 14px; }
   .sidebar-btn { justify-content: center; padding: 10px; }
   .main { margin-left: 60px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .charts-grid, .bottom-grid { grid-template-columns: 1fr; }
+  .gauges-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 640px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .pipeline-visual { flex-direction: column; }
+@media (max-width: 768px) {
+  .mobile-menu-btn { display: flex; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-open ~ .sidebar-overlay,
+  .sidebar-overlay { display: block; }
+
+  .sidebar-title, .sidebar-sub, .sidebar-btn span, .sidebar-footer span,
+  .sidebar-close-mobile { display: block; }
+
+  .sidebar-btn { justify-content: flex-start; padding: 10px 12px; }
+
+  .main { margin-left: 0; }
+
+  .topbar {
+    padding: 16px 16px 16px 64px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  .gauges-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 16px 16px;
+  }
+
+  .bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  .devices-page, .alerts-page, .agents-page {
+    padding: 16px;
+  }
+
+  .topbar-actions { gap: 8px; }
+  .topbar-stat { font-size: 11px; padding: 4px 8px; }
+  .topbar-stat span { display: none; }
+
+  .pipeline-visual { flex-direction: column; padding: 16px; }
   .pipeline-arrow { transform: rotate(90deg); }
+  .pipeline-node { min-width: unset; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .gauges-grid { grid-template-columns: 1fr 1fr; }
+  .stat-card { padding: 14px 16px; }
+  .stat-value { font-size: 18px; }
+  .gauge-value { font-size: 20px; }
+  .device-card-value { font-size: 22px; }
+  .devices-grid { grid-template-columns: 1fr; }
 }

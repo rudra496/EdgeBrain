@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, BarChart, Bar, Cell, PieChart, Pie
+  AreaChart, Area, BarChart, Bar, Cell, PieChart, Pie, RadialBarChart, RadialBar
 } from 'recharts';
 import {
   Thermometer, Activity, Zap, AlertTriangle, Wifi, WifiOff, Brain, Cpu, Radio,
   Droplets, Sun, Bell, BellOff, Send, RefreshCw, ChevronDown, ChevronRight,
-  CheckCircle, XCircle, Info, Shield, Server, LayoutDashboard, Settings
+  CheckCircle, XCircle, Info, Shield, Server, LayoutDashboard, Settings,
+  Menu, X, Gauge, TrendingUp, BarChart3
 } from 'lucide-react';
 import './App.css';
 
@@ -130,32 +131,95 @@ function DeviceCard({ device }) {
   );
 }
 
-function ChartCard({ title, icon: Icon, data, dataKey, color, unit }) {
+function ChartCard({ title, icon: Icon, data, dataKey, color, unit, chartType = 'area' }) {
+  const chartContent = chartType === 'bar' ? (
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={data || []}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+        <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+        <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={45} />
+        <Tooltip
+          contentStyle={{ background: '#1a1f35', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
+          formatter={(v) => [`${v} ${unit}`, '']}
+        />
+        <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  ) : (
+    <ResponsiveContainer width="100%" height={220}>
+      <AreaChart data={data || []}>
+        <defs>
+          <linearGradient id={`grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+            <stop offset="95%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+        <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+        <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={45} />
+        <Tooltip
+          contentStyle={{ background: '#1a1f35', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
+          formatter={(v) => [`${v} ${unit}`, '']}
+        />
+        <Area type="monotone" dataKey={dataKey} stroke={color} fill={`url(#grad-${dataKey})`} strokeWidth={2} dot={false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+
   return (
     <div className="chart-card">
       <div className="chart-header">
         <div className="chart-title"><Icon size={16} /> {title}</div>
-        <div className="chart-badge">{data?.length || 0} pts</div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="chart-badge">{data?.length || 0} pts</div>
+        </div>
       </div>
-      <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={data || []}>
-          <defs>
-            <linearGradient id={`grad-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.25} />
-              <stop offset="95%" stopColor={color} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-          <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-          <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={45} />
-          <Tooltip
-            contentStyle={{ background: '#1a1f35', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-            formatter={(v) => [`${v} ${unit}`, '']}
-          />
-          <Area type="monotone" dataKey={dataKey} stroke={color} fill={`url(#grad-${dataKey})`} strokeWidth={2} dot={false} />
-        </AreaChart>
-      </ResponsiveContainer>
+      {chartContent}
     </div>
+  );
+}
+
+function GaugeWidget({ title, value, min = 0, max = 100, unit, color, icon: Icon }) {
+  const pct = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
+  const gaugeData = [{ name: 'value', value: pct }, { name: 'bg', value: 100 - pct }];
+
+  return (
+    <div className="gauge-widget">
+      <div className="gauge-header">
+        <div className="gauge-title"><Icon size={14} /> {title}</div>
+      </div>
+      <div className="gauge-body">
+        <ResponsiveContainer width={120} height={90}>
+          <RadialBarChart cx="50%" cy="100%" innerRadius="60%" outerRadius="90%" startAngle={180} endAngle={0} barSize={12} data={gaugeData}>
+            <RadialBar
+              dataKey="value"
+              cornerRadius={6}
+              fill={color}
+              background={{ fill: '#1e293b' }}
+            />
+          </RadialBarChart>
+        </ResponsiveContainer>
+        <div className="gauge-value" style={{ color }}>
+          {value != null ? value.toFixed(1) : '—'}
+          <span className="gauge-unit">{unit}</span>
+        </div>
+      </div>
+      <div className="gauge-range">
+        <span>{min}</span>
+        <span>{max} {unit}</span>
+      </div>
+    </div>
+  );
+}
+
+function MiniSparkline({ data, color, height = 32 }) {
+  if (!data || data.length < 2) return null;
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data}>
+        <Line type="monotone" dataKey="value" stroke={color} strokeWidth={1.5} dot={false} />
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 
@@ -192,6 +256,7 @@ function AgentMessage({ msg }) {
 
 export default function App() {
   const [tab, setTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [wsData, setWsData] = useState({ devices: [], alerts: [], actuators: [] });
   const [timeSeries, setTimeSeries] = useState({});
   const [stats, setStats] = useState(null);
@@ -243,10 +308,23 @@ export default function App() {
     { id: 'agents', label: 'AI Agents', icon: Brain },
   ];
 
+  const latestReadings = {};
+  (wsData.devices || []).forEach(d => {
+    if (d.last_reading != null) latestReadings[d.device_type] = d.last_reading;
+  });
+
   return (
     <div className="app">
+      {/* Mobile Overlay */}
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Mobile Topbar (hamburger) */}
+      <button className="mobile-menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle menu">
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
       {/* Sidebar */}
-      <nav className="sidebar">
+      <nav className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-brand">
           <Brain size={24} />
           <div>
@@ -259,7 +337,7 @@ export default function App() {
           {tabs.map(t => (
             <button key={t.id}
               className={`sidebar-btn ${tab === t.id ? 'active' : ''}`}
-              onClick={() => setTab(t.id)}>
+              onClick={() => { setTab(t.id); setSidebarOpen(false); }}>
               <t.icon size={16} />
               {t.label}
               {t.id === 'alerts' && criticalAlerts.length > 0 && (
@@ -269,6 +347,9 @@ export default function App() {
           ))}
         </div>
 
+        <div className="sidebar-close-mobile" onClick={() => setSidebarOpen(false)}>
+          <X size={18} />
+        </div>
         <div className="sidebar-footer">
           <div className="ws-indicator">
             <span className="ws-dot" />
@@ -308,11 +389,19 @@ export default function App() {
               <StatCard icon={Activity} label="Readings Processed" value={sysStats?.ingestion?.total ?? '—'} sub="total" color="#22c55e" />
             </div>
 
+            {/* Gauge Widgets */}
+            <div className="gauges-grid">
+              <GaugeWidget title="Temperature" value={latestReadings['temperature']} min={-10} max={50} unit="°C" color="#ef4444" icon={Thermometer} />
+              <GaugeWidget title="Energy" value={latestReadings['energy']} min={0} max={500} unit="W" color="#eab308" icon={Zap} />
+              <GaugeWidget title="Humidity" value={latestReadings['humidity']} min={0} max={100} unit="%" color="#06b6d4" icon={Droplets} />
+              <GaugeWidget title="Light" value={latestReadings['light']} min={0} max={1000} unit="lux" color="#f97316" icon={Sun} />
+            </div>
+
             {/* Charts */}
             <div className="charts-grid">
-              <ChartCard title="Temperature" icon={Thermometer} data={timeSeries['temperature']} dataKey="value" color="#ef4444" unit="°C" />
-              <ChartCard title="Energy Consumption" icon={Zap} data={timeSeries['energy']} dataKey="value" color="#eab308" unit="W" />
-              <ChartCard title="Humidity" icon={Droplets} data={timeSeries['humidity']} dataKey="value" color="#06b6d4" unit="%" />
+              <ChartCard title="Temperature Trend" icon={Thermometer} data={timeSeries['temperature']} dataKey="value" color="#ef4444" unit="°C" />
+              <ChartCard title="Energy Consumption" icon={Zap} data={timeSeries['energy']} dataKey="value" color="#eab308" unit="W" chartType="bar" />
+              <ChartCard title="Humidity Trend" icon={Droplets} data={timeSeries['humidity']} dataKey="value" color="#06b6d4" unit="%" />
               <ChartCard title="Light Level" icon={Sun} data={timeSeries['light']} dataKey="value" color="#f97316" unit="lux" />
             </div>
 
