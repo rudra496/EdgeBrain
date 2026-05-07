@@ -41,8 +41,7 @@ class Settings(BaseSettings):
     ENERGY_SPIKE: float = 500.0
     NO_MOTION_TIMEOUT_S: int = 300
 
-    class Config:
-        env_file = ".env"
+    model_config = {"env_file": ".env"}
 
 
 @lru_cache()

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, DateTime, Integer, Boolean, Text, JSON, Index
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from app.core.database import Base
@@ -14,7 +14,7 @@ class SensorReading(Base):
     value = Column(Float, nullable=False)
     unit = Column(String(20), default="")
     extra = Column(JSONB, default=dict)
-    timestamp = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
 
     __table_args__ = (
         Index("idx_readings_device_ts", "device_id", "timestamp"),
@@ -42,7 +42,7 @@ class DeviceCommand(Base):
     source = Column(String(50), default="system")
     status = Column(String(20), default="pending")  # pending, sent, failed
     response = Column(Text, nullable=True)
-    timestamp = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
 
     def to_dict(self) -> dict:
         return {
@@ -68,7 +68,7 @@ class Alert(Base):
     data = Column(JSONB, default=dict)
     resolved = Column(Boolean, default=False)
     resolved_at = Column(DateTime(timezone=True), nullable=True)
-    timestamp = Column(DateTime(timezone=True), default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
 
     __table_args__ = (
         Index("idx_alerts_severity_ts", "severity", "timestamp"),
@@ -96,7 +96,7 @@ class DeviceState(Base):
     room = Column(String(50), default="default")
     is_online = Column(Boolean, default=True)
     last_reading = Column(Float)
-    last_seen = Column(DateTime(timezone=True), default=datetime.utcnow)
+    last_seen = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     total_readings = Column(Integer, default=0)
     metadata_ = Column("metadata", JSONB, default=dict)
 
@@ -120,7 +120,7 @@ class ActuatorState(Base):
     room = Column(String(50), default="default")
     is_active = Column(Boolean, default=False)
     last_command = Column(String(50), nullable=True)
-    last_changed = Column(DateTime(timezone=True), default=datetime.utcnow)
+    last_changed = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     metadata_ = Column("metadata", JSONB, default=dict)
 
     def to_dict(self) -> dict:

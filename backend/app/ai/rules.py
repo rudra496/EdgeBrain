@@ -112,15 +112,17 @@ class ThresholdStrategy(DecisionStrategy):
 
     def __init__(self, rules: dict | None = None):
         self.rules = rules or self.DEFAULT_RULES
-        self._last_decisions: dict[str, str] = {}  # device_type -> last action
+        self._last_decisions: dict[str, str] = {}  # (device_id, actuator) -> last action
 
     def evaluate(self, device_id: str, device_type: str, value: float,
                  history: list[float]) -> list[Decision]:
         decisions = []
         rules = self.rules.get(device_type, [])
-        last_action = self._last_decisions.get(device_type)
 
         for rule in rules:
+            actuator = rule.get("actuator", "unknown")
+            key = f"{device_id}:{actuator}"
+            last_action = self._last_decisions.get(key)
             threshold = rule["threshold"]
             hysteresis = rule.get("hysteresis", 0)
             triggered = False
@@ -145,13 +147,13 @@ class ThresholdStrategy(DecisionStrategy):
                 decisions.append(Decision(
                     action=rule["action"],
                     device_id=device_id,
-                    params={"actuator": rule.get("actuator", "unknown")},
+                    params={"actuator": actuator},
                     reason=reason,
                     confidence=rule.get("confidence", 0.8),
                     severity=rule.get("severity", "info"),
                     source=self.name,
                 ))
-                self._last_decisions[device_type] = rule["action"]
+                self._last_decisions[key] = rule["action"]
 
         return decisions
 

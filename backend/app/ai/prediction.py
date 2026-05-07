@@ -110,9 +110,11 @@ class Predictor:
         ema_trend = ema - (alpha * arr[-2] + (1 - alpha) * ema) if n >= 2 else 0
         for step in range(1, steps + 1):
             pred = ema + ema_trend * step
+            recent_std = np.std(arr[-10:]) if len(arr) >= 10 else np.std(arr)
+            ema_conf = max(0.1, 1.0 - (recent_std / (abs(ema) + 1e-8)))
             results.append(PredictionResult(
                 value=round(pred, 2),
-                confidence=0.6,
+                confidence=round(ema_conf, 2),
                 method="ema",
                 horizon=step,
                 details={"alpha": round(alpha, 3)},

@@ -246,3 +246,59 @@ class TestDecision:
         assert d.params == {}
         assert d.confidence == 0.0
         assert d.severity == "info"
+
+
+class TestHysteresisIsolation:
+    """Verify hysteresis state is per-device, not per-type."""
+
+    def test_independent_hysteresis(self):
+        s = ThresholdStrategy()
+        # Device A triggers fan at 32°C
+        d_a = s.evaluate("room-1", "temperature", 32.0, [])
+        assert any(x.params["actuator"] == "fan" for x in d_a)
+
+        # Device B at 26°C should NOT have hysteresis from device A
+        d_b = s.evaluate("room-2", "temperature", 26.0, [])
+        # room-2 never activated fan, so no hysteresis — fan deactivate should NOT trigger
+        assert not any(x.action == "deactivate" and x.params["actuator"] == "fan" for x in d_b)
+
+    def test_same_device_hysteresis(self):
+        s = ThresholdStrategy()
+        # Activate fan for device A
+        s.evaluate("room-1", "temperature", 32.0, [])
+        # Same device at 26°C — hysteresis should prevent deactivate
+        d = s.evaluate("room-1", "temperature", 26.0, [])
+        assert not any(x.action == "deactivate" and x.params["actuator"] == "fan" for x in d)
+        # Same device at 22°C — below hysteresis band, should deactivate
+        d2 = s.evaluate("room-1", "temperature", 22.0, [])
+        assert any(x.action == "deactivate" and x.params["actuator"] == "fan" for x in d2)
+
+    def test_different_actuators_independent(self):
+        s = ThresholdStrategy()
+        # High temp triggers both alarm and fan
+        d = s.evaluate("room-1", "temperature", 45.0, [])
+        actions = [(x.action, x.params["actuator"]) for x in d]
+        assert ("activate", "alarm") in actions
+        assert ("activate", "fan") in actions
+
+
+class TestPredictionConfidence:
+    """Verify EMA prediction uses dynamic confidence, not hardcoded."""
+
+    def test_ema_varying_confidence(self):
+        p = Predictor()
+        # Stable series — high EMA confidence
+        stable = [25.0 + i * 0.01 for i in range(30)]
+        preds_stable = p.predict(stable, 1)
+        ema_stable = next((x for x in preds_stable if x.method == "ema"), None)
+        if ema_stable:
+            assert ema_stable.confidence > 0.3
+
+        # Volatile series — lower EMA confidence
+        import random
+        random.seed(42)
+        volatile = [25.0 + random.gauss(0, 10) for _ in range(30)]
+        preds_volatile = p.predict(volatile, 1)
+        ema_volatile = next((x for x in preds_volatile if x.method == "ema"), None)
+        if ema_volatile:
+            assert ema_volatile.confidence < ema_stable.confidence

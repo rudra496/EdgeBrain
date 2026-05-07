@@ -29,11 +29,12 @@ class MQTTClient:
         logger.info(f"MQTT connected (rc={reason_code})")
         with self._lock:
             self._connected = True
-        # Re-subscribe on reconnect
-        topics = list(self._handlers.keys()) + ["#"] if self._wildcard_handlers else list(self._handlers.keys())
-        for t in topics:
-            if t != "#":
-                client.subscribe(t)
+        # Re-subscribe specific topics on reconnect
+        for topic in list(self._handlers.keys()):
+            client.subscribe(topic)
+        # Re-subscribe wildcard if registered
+        if self._wildcard_handlers:
+            client.subscribe("#")
 
     def _on_disconnect(self, client, userdata, reason_code, properties=None):
         logger.warning(f"MQTT disconnected (rc={reason_code})")

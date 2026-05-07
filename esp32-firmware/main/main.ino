@@ -1,13 +1,17 @@
 /*
  * EdgeBrain ESP32 Firmware
- * Reads temperature (DHT11) and motion (PIR) sensors, publishes via MQTT.
+ * Reads motion (PIR) sensor and simulated temperature, publishes via MQTT.
  *
  * Hardware:
- *   - DHT11 on GPIO 4 (data pin)
  *   - PIR sensor on GPIO 5 (digital input)
- *   - LED on GPIO 2 (built-in)
+ *   - LED on GPIO 2 (built-in, used as actuator indicator)
  *
- * Configure WiFi and MQTT settings in config.h or below.
+ * Temperature is simulated by default. To use a real DHT11:
+ *   1. Install DHT sensor library: https://github.com/adafruit/DHT-sensor-library
+ *   2. Connect DHT11 data pin to GPIO 4
+ *   3. Uncomment the DHT code in readTemperature()
+ *
+ * Configure WiFi and MQTT settings below.
  */
 
 #include <WiFi.h>

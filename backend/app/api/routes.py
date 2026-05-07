@@ -115,9 +115,8 @@ ws_manager = ConnectionManager()
 
 def broadcast_to_all(data: dict):
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            asyncio.create_task(ws_manager.broadcast(data))
+        loop = asyncio.get_running_loop()
+        loop.call_soon_threadsafe(lambda: asyncio.ensure_future(ws_manager.broadcast(data)))
     except RuntimeError:
         pass
 
@@ -233,7 +232,7 @@ def predict_device(device_id: str, steps: int = Query(default=5, ge=1, le=50)):
 @router.get("/devices/{device_id}/export")
 def export_device_data(
     device_id: str,
-    format: str = Query(default="json", regex="^(json|csv)$"),
+    format: str = Query(default="json", pattern="^(json|csv)$"),
     minutes: int = Query(default=1440, ge=1, le=10080),
     limit: int = Query(default=10000, ge=1, le=100000),
 ):

@@ -1,7 +1,7 @@
 import logging
 import json
 import redis
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from app.core.config import get_settings
@@ -36,7 +36,7 @@ class EventQueue:
         event = {
             "type": event_type,
             "data": data,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.redis.lpush(EVENTS_KEY, json.dumps(event))
         self.redis.ltrim(EVENTS_KEY, 0, MAX_EVENTS)
@@ -44,7 +44,7 @@ class EventQueue:
         logger.info(f"Event: {event_type}")
 
     def push_alert(self, alert: dict):
-        alert["timestamp"] = alert.get("timestamp", datetime.utcnow().isoformat())
+        alert["timestamp"] = alert.get("timestamp", datetime.now(timezone.utc).isoformat())
         self.redis.lpush(ALERTS_KEY, json.dumps(alert))
         self.redis.ltrim(ALERTS_KEY, 0, MAX_ALERTS)
         self.redis.publish("edgebrain:alerts:live", json.dumps(alert))
@@ -56,7 +56,7 @@ class EventQueue:
             "device_type": device_type,
             "value": value,
             "unit": unit,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.redis.publish("edgebrain:telemetry:live", json.dumps(telemetry))
 

@@ -27,7 +27,7 @@
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react)](https://react.dev)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql)](https://postgresql.org)
 [![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=flat-square&logo=redis)](https://redis.io)
-[![MQTT](https://img.shields.io/badge/MQTT-5.0-6C0094?style=flat-square)](https://mqtt.org)
+[![MQTT](https://img.shields.io/badge/MQTT-3.1.1-6C0094?style=flat-square)](https://mqtt.org)
 [![Stars](https://img.shields.io/github/stars/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/stargazers)
 [![Forks](https://img.shields.io/github/forks/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/network/members)
 [![Issues](https://img.shields.io/github/issues/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/issues)
@@ -126,7 +126,7 @@ docker compose up --build -d
 <details>
 <summary><strong>🔌 Communication & Integration</strong></summary>
 
-- **MQTT 5.0** — topic-based architecture with QoS support
+- **MQTT 3.1.1** — topic-based architecture with QoS support
 - **WebSocket** — real-time bidirectional dashboard updates
 - **REST API** — 20+ endpoints with auto-generated OpenAPI docs
 - **Data Export** — CSV and JSON export for any device's readings
@@ -149,9 +149,9 @@ docker compose up --build -d
 <summary><strong>🔧 Optional Hardware</strong></summary>
 
 - **ESP32 firmware** — Arduino C++ with WiFi + MQTT
-- **DHT11** — temperature & humidity sensor
+- **DHT11** — temperature sensor (code simulated by default, real sensor supported)
 - **PIR** — passive infrared motion sensor
-- **LED + Buzzer** — actuator control
+- **LED** — actuator indicator
 - **Configurable** — just edit WiFi + MQTT credentials
 
 </details>
@@ -236,7 +236,7 @@ graph TB
     end
 
     subgraph Comms["📡 Communication Layer"]
-        MQTT["Mosquitto MQTT 5.0"]
+        MQTT["Mosquitto MQTT 3.1.1"]
     end
 
     subgraph BE["🧠 Backend (FastAPI)"]
@@ -365,6 +365,9 @@ EdgeBrain/
 │
 ├── device-simulator/
 │   └── simulator.py                # 11 devices, 3 rooms, realistic data
+│
+├── simulator/
+│   └── Dockerfile                  # Simulator container
 │
 ├── esp32-firmware/
 │   ├── main/main.ino               # ESP32 Arduino firmware

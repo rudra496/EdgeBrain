@@ -43,7 +43,7 @@ EdgeBrain uses a **modular monolith** architecture with clear module boundaries.
            │                           │
 ┌──────────▼──────────┐    ┌───────────▼──────────┐
 │  Device Simulator   │    │   ESP32 (optional)   │
-│  (5 virtual devices)│    │   (real hardware)    │
+│  (11 virtual devices)│    │   (real hardware)    │
 └─────────────────────┘    └──────────────────────┘
 ```
 
@@ -88,7 +88,8 @@ sequenceDiagram
 
 5. **Decision Agent** evaluates through all registered strategies:
    - ThresholdStrategy: rule-based triggers
-   - AnomalyDetector: z-score based anomaly detection
+   - AnomalyDetector: z-score, IQR, gradient anomaly detection
+   - NoMotionStrategy: timeout-based light control
 6. Returns list of Decision objects
 
 7. **Action Agent**:
@@ -98,11 +99,12 @@ sequenceDiagram
 
 ## Database Schema
 
-Three main tables:
+Five database tables:
 - `sensor_readings` — time-series sensor data (with timestamp index)
 - `device_commands` — actuator commands sent
 - `alerts` — system alerts with severity levels
 - `device_states` — current device state cache
+- `actuator_states` — actuator on/off state tracking
 
 ## Plugin System
 

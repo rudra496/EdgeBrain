@@ -67,10 +67,6 @@ class ExecutionService:
             return cmd.to_dict()
         except Exception as e:
             db.rollback()
-            if cmd.id:
-                cmd.status = "failed"
-                cmd.response = str(e)
-                db.commit()
             logger.error(f"Command failed for {device_id}: {e}")
             return None
         finally:

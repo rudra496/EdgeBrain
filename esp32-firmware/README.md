@@ -6,10 +6,11 @@ Optional real hardware integration for EdgeBrain.
 
 | Component | Pin | Notes |
 |-----------|-----|-------|
-| DHT11 | GPIO 4 | Temperature sensor |
+| DHT11 | GPIO 4 | Temperature sensor (simulated by default) |
 | PIR Sensor | GPIO 5 | Motion detector |
 | LED | GPIO 2 | Built-in |
-| Buzzer | GPIO 13 | Optional alarm |
+
+> **Note:** Temperature readings are currently simulated in firmware. To use a real DHT11 sensor, install the [DHT sensor library](https://github.com/adafruit/DHT-sensor-library) and uncomment the DHT code in `main.ino`.
 
 ## Setup
 
