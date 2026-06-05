@@ -186,8 +186,8 @@ function ChartCard({ title, icon: Icon, data, dataKey, color, unit, chartType = 
         {chartType === 'bar' ? (
           <BarChart data={data || []}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-            <XAxis dataKey="time" stroke="#475569" tick= fontSize: 10  interval="preserveStartEnd" />
-            <YAxis stroke="#475569" tick= fontSize: 10  width={45} />
+            <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+            <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={45} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v} ${unit}`, '']} />
             <Bar dataKey={dataKey} fill={color} radius={[4, 4, 0, 0]} />
           </BarChart>
@@ -200,8 +200,8 @@ function ChartCard({ title, icon: Icon, data, dataKey, color, unit, chartType = 
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-            <XAxis dataKey="time" stroke="#475569" tick= fontSize: 10  interval="preserveStartEnd" />
-            <YAxis stroke="#475569" tick= fontSize: 10  width={45} />
+            <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+            <YAxis stroke="#475569" tick={{ fontSize: 10 }} width={45} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v} ${unit}`, '']} />
             <Area type="monotone" dataKey={dataKey} stroke={color} fill={`url(#grad-${dataKey})`} strokeWidth={2} dot={false} />
           </AreaChart>
@@ -223,7 +223,7 @@ function GaugeWidget({ title, value, min = 0, max = 100, unit, color, icon: Icon
       <div className="gauge-body">
         <ResponsiveContainer width={120} height={90}>
           <RadialBarChart cx="50%" cy="100%" innerRadius="60%" outerRadius="90%" startAngle={180} endAngle={0} barSize={12} data={gaugeData}>
-            <RadialBar dataKey="value" cornerRadius={6} fill={color} background= fill: '#1f2937'  />
+            <RadialBar dataKey="value" cornerRadius={6} fill={color} background={{ fill: '#1f2937' }} />
           </RadialBarChart>
         </ResponsiveContainer>
         <div className="gauge-value">
@@ -383,7 +383,7 @@ export default function App() {
           <div className="topbar-actions">
             <div className="topbar-stat"><Cpu size={14} /> <span>{wsData.devices?.length || 0} devices</span></div>
             <div className="topbar-stat"><Zap size={14} /> <span>{liveFeed.length} events/s</span></div>
-            <div className="topbar-stat" style= color: topStatColor >
+            <div className="topbar-stat" style={{ color: topStatColor }}>
               {criticalAlerts.length > 0 ? <AlertTriangle size={14} /> : <Shield size={14} />}
               <span>{criticalAlerts.length} critical</span>
             </div>
@@ -468,20 +468,20 @@ export default function App() {
             <div className="section-header"><h2>AI Agent System</h2><span className="section-badge">Multi-Agent Pipeline</span></div>
 
             <div className="pipeline-visual">
-              <div className="pipeline-node" style= borderColor: '#818cf8' >
-                <div className="pipeline-icon" style= background: '#818cf822', border: '1px solid #818cf833' ><Activity size={18} /></div>
+              <div className="pipeline-node" style={{ borderColor: '#818cf8' }}>
+                <div className="pipeline-icon" style={{ background: '#818cf822', border: '1px solid #818cf833' }}><Activity size={18} /></div>
                 <div className="pipeline-label">Data Agent</div>
                 <div className="pipeline-desc">Validate & Store</div>
               </div>
               <div className="pipeline-arrow">→</div>
-              <div className="pipeline-node" style= borderColor: '#f472b6' >
-                <div className="pipeline-icon" style= background: '#f472b622', border: '1px solid #f472b633' ><Brain size={18} /></div>
+              <div className="pipeline-node" style={{ borderColor: '#f472b6' }}>
+                <div className="pipeline-icon" style={{ background: '#f472b622', border: '1px solid #f472b633' }}><Brain size={18} /></div>
                 <div className="pipeline-label">Decision Agent</div>
                 <div className="pipeline-desc">Rules + Anomaly</div>
               </div>
               <div className="pipeline-arrow">→</div>
-              <div className="pipeline-node" style= borderColor: '#34d399' >
-                <div className="pipeline-icon" style= background: '#34d39922', border: '1px solid #34d39933' ><Send size={18} /></div>
+              <div className="pipeline-node" style={{ borderColor: '#34d399' }}>
+                <div className="pipeline-icon" style={{ background: '#34d39922', border: '1px solid #34d39933' }}><Send size={18} /></div>
                 <div className="pipeline-label">Action Agent</div>
                 <div className="pipeline-desc">Execute Commands</div>
               </div>
