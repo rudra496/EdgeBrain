@@ -6,8 +6,8 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-scripts": "5.0.1",
-    "recharts": "^2.12.0",
-    "lucide-react": "^0.344.0"
+    "recharts": "^3.8.1",
+    "lucide-react": "^1.17.0"
   },
   "scripts": {
     "start": "react-scripts start",
