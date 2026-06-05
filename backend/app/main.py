@@ -1,16 +1,29 @@
 import logging
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.core.config import get_settings
-from app.core.database import engine, Base
-from app.core.mqtt_client import mqtt_client
-from app.core.events import event_queue
+
 from app.api.routes import router
+from app.core.config import get_settings
+from app.core.database import Base, engine
+from app.core.events import event_queue
+from app.core.mqtt_client import mqtt_client
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+
+def _normalize_cors_origins(origins):
+    """Normalize origins from settings into a list FastAPI expects."""
+    if origins is None:
+        return ["*"]
+    if isinstance(origins, str):
+        origins = [o.strip() for o in origins.split(",") if o.strip()]
+    if not origins:
+        return ["*"]
+    return list(origins)
 
 
 @asynccontextmanager
@@ -77,15 +90,16 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+cors_origins = _normalize_cors_origins(settings.CORS_ORIGINS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"] ,
+    allow_headers=["*"] ,
 )
 
-# Global exception handler
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
@@ -93,6 +107,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Internal server error"},
     )
+
 
 app.include_router(router, prefix="/api/v1")
 
@@ -125,4 +140,5 @@ def system_info():
             "agents": ["Data Agent", "Decision Agent", "Action Agent"],
         },
         "mqtt_status": "connected" if mqtt_client.is_connected else "disconnected",
+        "cors_origins": cors_origins,
     }
