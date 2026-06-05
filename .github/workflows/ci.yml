@@ -47,6 +47,6 @@ jobs:
       - name: Get version
         id: v
         run: echo "tag=$(echo '${{ github.event.head_commit.message }}' | grep -oP 'v[\d.]+')" >> $GITHUB_OUTPUT
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with: { tag_name: "${{ steps.v.outputs.tag }}", generate_release_notes: true }
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
