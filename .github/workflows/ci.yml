@@ -21,7 +21,7 @@ jobs:
         image: redis:7-alpine
         ports: ["6379:6379"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v5
         with: { python-version: "3.11", cache: pip, cache-dependency-path: backend/requirements.txt }
       - name: Install deps
@@ -43,10 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && startsWith(github.event.head_commit.message, 'release:')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Get version
         id: v
         run: echo "tag=$(echo '${{ github.event.head_commit.message }}' | grep -oP 'v[\d.]+')" >> $GITHUB_OUTPUT
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with: { tag_name: "${{ steps.v.outputs.tag }}", generate_release_notes: true }
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
