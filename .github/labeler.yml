@@ -1,0 +1,34 @@
+backend:
+  - changed-files:
+      - any-glob-to-any-file: "backend/**"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: "frontend/**"
+
+firmware:
+  - changed-files:
+      - any-glob-to-any-file: "esp32-firmware/**"
+
+simulator:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "simulator/**"
+          - "device-simulator/**"
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docker/**"
+          - "docker-compose.yml"
+          - "Dockerfile"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/**"
