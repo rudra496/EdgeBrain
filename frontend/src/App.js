@@ -1,12 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, BarChart, Bar, RadialBarChart, RadialBar
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  RadialBarChart,
+  RadialBar,
 } from 'recharts';
 import {
-  Thermometer, Activity, Zap, AlertTriangle, Wifi, WifiOff, Brain, Cpu, Radio,
-  Droplets, Sun, Bell, Shield, LayoutDashboard,
-  Menu, X, Send
+  Activity,
+  AlertTriangle,
+  Bell,
+  Brain,
+  Cpu,
+  Droplets,
+  LayoutDashboard,
+  Menu,
+  Radio,
+  Send,
+  Shield,
+  Sun,
+  Thermometer,
+  Wifi,
+  WifiOff,
+  X,
+  Zap,
 } from 'lucide-react';
 import './App.css';
 
@@ -86,21 +111,21 @@ const DEVICE_COLORS = {
   motion: '#22c55e',
   energy: '#eab308',
   humidity: '#06b6d4',
-  light: '#f97316'
+  light: '#f97316',
 };
 const DEVICE_ICONS = {
   temperature: Thermometer,
   motion: Activity,
   energy: Zap,
   humidity: Droplets,
-  light: Sun
+  light: Sun,
 };
 
 function StatCard({ icon: Icon, label, value, sub, color }) {
   return (
     <div className="stat-card">
       <div className="stat-icon" style={{ background: `${color}22`, border: `1px solid ${color}33` }}>
-        <Icon size={18} style= color  />
+        <Icon size={18} color={color} />
       </div>
       <div className="stat-info">
         <div className="stat-label">{label}</div>
@@ -120,19 +145,17 @@ function DeviceCard({ device }) {
     <div className="device-card">
       <div className="device-card-header">
         <div className="device-card-icon" style={{ background: `${color}1a`, border: `1px solid ${color}33` }}>
-          <Icon size={16} style= color  />
+          <Icon size={16} color={color} />
         </div>
         <div className="device-card-info">
           <div className="device-card-type">{device.device_type}</div>
           <div className="device-card-room">{room.replace(/-/g, ' ')}</div>
         </div>
         <div className="device-card-status">
-          {device.is_online
-            ? <Wifi size={12} color="#22c55e" />
-            : <WifiOff size={12} color="#ef4444" />}
+          {device.is_online ? <Wifi size={12} color="#22c55e" /> : <WifiOff size={12} color="#ef4444" />}
         </div>
       </div>
-      <div className="device-card-value" style= color >
+      <div className="device-card-value">
         {device.last_reading?.toFixed(1) ?? '—'}
       </div>
       <div className="device-card-footer">
@@ -149,7 +172,7 @@ function ChartCard({ title, icon: Icon, data, dataKey, color, unit, chartType = 
     border: '1px solid #1e293b',
     borderRadius: 12,
     padding: 10,
-    color: '#e2e8f0'
+    color: '#e2e8f0',
   };
 
   return (
@@ -199,25 +222,11 @@ function GaugeWidget({ title, value, min = 0, max = 100, unit, color, icon: Icon
       </div>
       <div className="gauge-body">
         <ResponsiveContainer width={120} height={90}>
-          <RadialBarChart
-            cx="50%"
-            cy="100%"
-            innerRadius="60%"
-            outerRadius="90%"
-            startAngle={180}
-            endAngle={0}
-            barSize={12}
-            data={gaugeData}
-          >
-            <RadialBar
-              dataKey="value"
-              cornerRadius={6}
-              fill={color}
-              background= fill: '#1f2937' 
-            />
+          <RadialBarChart cx="50%" cy="100%" innerRadius="60%" outerRadius="90%" startAngle={180} endAngle={0} barSize={12} data={gaugeData}>
+            <RadialBar dataKey="value" cornerRadius={6} fill={color} background= fill: '#1f2937'  />
           </RadialBarChart>
         </ResponsiveContainer>
-        <div className="gauge-value" style= color >
+        <div className="gauge-value">
           {value != null ? value.toFixed(1) : '—'}
           <span className="gauge-unit">{unit}</span>
         </div>
@@ -247,7 +256,7 @@ function AgentMessage({ msg }) {
     data_agent: '#818cf8',
     decision_agent: '#f472b6',
     action_agent: '#34d399',
-    system: '#64748b'
+    system: '#64748b',
   };
 
   const dotStyle = { background: agentColors[msg.sender] || '#64748b' };
@@ -325,6 +334,8 @@ export default function App() {
     if (d.last_reading != null) latestReadings[d.device_type] = d.last_reading;
   });
 
+  const topStatColor = criticalAlerts.length > 0 ? '#ef4444' : '#22c55e';
+
   return (
     <div className="app">
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
@@ -372,7 +383,7 @@ export default function App() {
           <div className="topbar-actions">
             <div className="topbar-stat"><Cpu size={14} /> <span>{wsData.devices?.length || 0} devices</span></div>
             <div className="topbar-stat"><Zap size={14} /> <span>{liveFeed.length} events/s</span></div>
-            <div className="topbar-stat" style= color: criticalAlerts.length > 0 ? '#ef4444' : '#22c55e' >
+            <div className="topbar-stat" style= color: topStatColor >
               {criticalAlerts.length > 0 ? <AlertTriangle size={14} /> : <Shield size={14} />}
               <span>{criticalAlerts.length} critical</span>
             </div>
