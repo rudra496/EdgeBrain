@@ -1,9 +1,13 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 # ─── Sensor Data ──────────────────────────────────────────
+
 
 class SensorReadingOut(BaseModel):
     id: str
@@ -11,7 +15,7 @@ class SensorReadingOut(BaseModel):
     device_type: str
     value: float
     unit: str
-    extra: dict = {}
+    extra: dict = Field(default_factory=dict)
     timestamp: str
 
 
@@ -37,11 +41,12 @@ class DeviceStatistics(BaseModel):
 
 # ─── Commands ────────────────────────────────────────────
 
+
 class CommandOut(BaseModel):
     id: str
     device_id: str
     command: str
-    params: dict = {}
+    params: dict = Field(default_factory=dict)
     source: str
     status: str
     response: Optional[str] = None
@@ -64,13 +69,14 @@ class ActuatorStateOut(BaseModel):
 
 # ─── Alerts ──────────────────────────────────────────────
 
+
 class AlertOut(BaseModel):
     id: str
     device_id: str
     alert_type: str
     severity: str
     message: str
-    data: dict = {}
+    data: dict = Field(default_factory=dict)
     resolved: bool
     resolved_at: Optional[str] = None
     timestamp: str
@@ -84,6 +90,7 @@ class AlertSummary(BaseModel):
 
 
 # ─── Agents ──────────────────────────────────────────────
+
 
 class AgentMessageOut(BaseModel):
     id: str
@@ -103,6 +110,7 @@ class AgentStats(BaseModel):
 
 # ─── Prediction ──────────────────────────────────────────
 
+
 class PredictionOut(BaseModel):
     value: float
     confidence: float
@@ -112,6 +120,7 @@ class PredictionOut(BaseModel):
 
 
 # ─── System ──────────────────────────────────────────────
+
 
 class HealthCheck(BaseModel):
     status: str
@@ -136,6 +145,7 @@ class SystemInfo(BaseModel):
 
 
 # ─── Generic ─────────────────────────────────────────────
+
 
 class MessageResponse(BaseModel):
     message: str
