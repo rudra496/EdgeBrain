@@ -16,108 +16,98 @@ class ExecutionService:
         params = params or {}
         actuator_type = params.get("actuator", "unknown")
 
-        cmd = DeviceCommand(
-            device_id=device_id,
-            command=command,
-            params=params,
-            source=source,
-            status="pending",
-            timestamp=datetime.now(timezone.utc),
-        )
-
         db = SessionLocal()
         try:
+            cmd = DeviceCommand(
+                device_id=device_id,
+                command=command,
+                params=params,
+                source=source,
+                status="sent",
+            )
             db.add(cmd)
 
-            # Publish via MQTT
-            mqtt_client.publish(f"device/{device_id}/command", {
-                "command": command,
-                "params": params,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "source": source,
-            })
-
             # Update actuator state
-            state = db.query(ActuatorState).filter(
-                ActuatorState.device_id == device_id
-            ).first()
-            if state is None:
-                state = ActuatorState(
+            actuator = (
+                db.query(ActuatorState)
+                .filter(ActuatorState.device_id == device_id, ActuatorState.actuator_type == actuator_type)
+                .first()
+            )
+            if actuator:
+                actuator.last_command = command
+                actuator.last_changed = datetime.now(timezone.utc)
+                if command in ("on", "start", "open"):
+                    actuator.is_active = True
+                elif command in ("off", "stop", "close"):
+                    actuator.is_active = False
+            else:
+                actuator = ActuatorState(
                     device_id=device_id,
                     actuator_type=actuator_type,
-                    is_active=(command == "activate"),
+                    room=params.get("room", ""),
+                    is_active=command in ("on", "start", "open"),
                     last_command=command,
-                    last_changed=datetime.now(timezone.utc),
                 )
-                db.add(state)
-            else:
-                state.is_active = (command == "activate")
-                state.last_command = command
-                state.last_changed = datetime.now(timezone.utc)
+                db.add(actuator)
 
-            cmd.status = "sent"
             db.commit()
-            db.refresh(cmd)
 
-            # Broadcast
-            from app.core.events import event_queue
-            event_queue.push_event("command", cmd.to_dict())
+            # Publish via MQTT
+            topic = f"edgebrain/devices/{device_id}/command"
+            payload = {
+                "command": command,
+                "params": params,
+                "source": source,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            mqtt_client.publish(topic, payload)
 
-            logger.info(f"Command '{command}' sent to {device_id} (actuator: {actuator_type})")
+            logger.info(f"Command sent: {device_id} -> {command} ({params})")
             return cmd.to_dict()
         except Exception as e:
             db.rollback()
-            logger.error(f"Command failed for {device_id}: {e}")
+            logger.error(f"Command error for {device_id}: {e}")
             return None
         finally:
             db.close()
 
-    def get_commands(self, device_id: str | None = None, limit: int = 50) -> list[dict]:
-        db = SessionLocal()
-        try:
-            query = db.query(DeviceCommand)
-            if device_id:
-                query = query.filter(DeviceCommand.device_id == device_id)
-            cmds = query.order_by(desc(DeviceCommand.timestamp)).limit(limit).all()
-            return [c.to_dict() for c in cmds]
-        finally:
-            db.close()
+    def get_commands(self, minutes: int = 60, limit: int = 100) -> list[dict]:
+        from datetime import timedelta
 
-    def get_actuator_states(self) -> list[dict]:
         db = SessionLocal()
         try:
-            states = db.query(ActuatorState).order_by(ActuatorState.device_id).all()
-            return [s.to_dict() for s in states]
+            since = datetime.now(timezone.utc) - timedelta(minutes=minutes)
+            rows = (
+                db.query(DeviceCommand)
+                .filter(DeviceCommand.timestamp >= since)
+                .order_by(desc(DeviceCommand.timestamp))
+                .limit(limit)
+                .all()
+            )
+            return [c.to_dict() for c in rows]
         finally:
             db.close()
 
 
 class AlertService:
-    """Creates, resolves, and queries alerts."""
+    """Manages alert lifecycle: creation, acknowledgment, and resolution."""
 
-    def create_alert(self, device_id: str, alert_type: str, severity: str,
-                     message: str, data: dict | None = None) -> dict:
-        alert = Alert(
-            device_id=device_id,
-            alert_type=alert_type,
-            severity=severity,
-            message=message,
-            data=data or {},
-            timestamp=datetime.now(timezone.utc),
-        )
-
+    def create_alert(self, device_id: str, device_type: str, severity: str,
+                     message: str, value: float = 0.0, threshold: float = 0.0) -> dict:
         db = SessionLocal()
         try:
+            alert = Alert(
+                device_id=device_id,
+                device_type=device_type,
+                severity=severity,
+                message=message,
+                value=value,
+                threshold=threshold,
+            )
             db.add(alert)
             db.commit()
-            db.refresh(alert)
-            result = alert.to_dict()
-
-            # Push to Redis for real-time notification
-            from app.core.events import event_queue
-            event_queue.push_alert(result)
-
-            return result
+            logger.warning(f"Alert [{severity}]: {device_id} - {message} (value={value}, threshold={threshold})")
+            return alert.to_dict()
         except Exception as e:
             db.rollback()
             logger.error(f"Alert creation error: {e}")
@@ -125,59 +115,83 @@ class AlertService:
         finally:
             db.close()
 
-    def resolve_alert(self, alert_id: str) -> bool:
+    def acknowledge_alert(self, alert_id: str, acknowledged_by: str) -> dict | None:
+        """Acknowledge an alert."""
         db = SessionLocal()
         try:
             alert = db.query(Alert).filter(Alert.id == alert_id).first()
-            if alert:
-                alert.resolved = True
-                alert.resolved_at = datetime.now(timezone.utc)
-                db.commit()
-                return True
-            return False
-        finally:
-            db.close()
-
-    def resolve_device_alerts(self, device_id: str) -> int:
-        db = SessionLocal()
-        try:
-            count = db.query(Alert).filter(
-                Alert.device_id == device_id, Alert.resolved == False
-            ).update({"resolved": True, "resolved_at": datetime.now(timezone.utc)})
+            if not alert:
+                return None
+            alert.acknowledged = True
+            alert.acknowledged_at = datetime.now(timezone.utc)
+            alert.acknowledged_by = acknowledged_by
             db.commit()
-            return count
+            logger.info(f"Alert {alert_id} acknowledged by {acknowledged_by}")
+            return alert.to_dict()
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Alert acknowledge error: {e}")
+            return None
         finally:
             db.close()
 
-    def get_alerts(self, limit: int = 50, unresolved_only: bool = False,
-                   device_id: str | None = None, severity: str | None = None) -> list[dict]:
+    def resolve_alert(self, alert_id: str, resolved_by: str, resolution_note: str | None = None) -> dict | None:
+        """Resolve an alert."""
         db = SessionLocal()
         try:
-            query = db.query(Alert)
-            if unresolved_only:
-                query = query.filter(Alert.resolved == False)
-            if device_id:
-                query = query.filter(Alert.device_id == device_id)
+            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            if not alert:
+                return None
+            alert.resolved = True
+            alert.resolved_at = datetime.now(timezone.utc)
+            alert.resolved_by = resolved_by
+            alert.resolution_note = resolution_note
+            # Auto-acknowledge if not already
+            if not alert.acknowledged:
+                alert.acknowledged = True
+                alert.acknowledged_at = datetime.now(timezone.utc)
+                alert.acknowledged_by = resolved_by
+            db.commit()
+            logger.info(f"Alert {alert_id} resolved by {resolved_by}")
+            return alert.to_dict()
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Alert resolve error: {e}")
+            return None
+        finally:
+            db.close()
+
+    def get_alerts(self, severity: str | None = None, resolved: bool | None = None,
+                   minutes: int = 1440, limit: int = 100) -> list[dict]:
+        from datetime import timedelta
+
+        db = SessionLocal()
+        try:
+            since = datetime.now(timezone.utc) - timedelta(minutes=minutes)
+            q = db.query(Alert).filter(Alert.timestamp >= since)
             if severity:
-                query = query.filter(Alert.severity == severity)
-            alerts = query.order_by(desc(Alert.timestamp)).limit(limit).all()
-            return [a.to_dict() for a in alerts]
+                q = q.filter(Alert.severity == severity)
+            if resolved is not None:
+                q = q.filter(Alert.resolved == resolved)
+            rows = q.order_by(desc(Alert.timestamp)).limit(limit).all()
+            return [a.to_dict() for a in rows]
         finally:
             db.close()
 
-    def get_alert_summary(self) -> dict:
+    def get_stats(self) -> dict:
         db = SessionLocal()
         try:
-            total = db.query(func.count(Alert.id)).scalar() or 0
-            unresolved = db.query(func.count(Alert.id)).filter(Alert.resolved == False).scalar() or 0
-            critical = db.query(func.count(Alert.id)).filter(
-                Alert.severity == "critical", Alert.resolved == False
-            ).scalar() or 0
-
+            total = db.query(Alert).count()
+            unresolved = db.query(Alert).filter(Alert.resolved == False).count()
+            unacknowledged = db.query(Alert).filter(Alert.acknowledged == False).count()
+            critical = db.query(Alert).filter(Alert.severity == "critical", Alert.resolved == False).count()
+            warning = db.query(Alert).filter(Alert.severity == "warning", Alert.resolved == False).count()
             return {
                 "total": total,
                 "unresolved": unresolved,
-                "critical_unresolved": critical,
+                "unacknowledged": unacknowledged,
+                "active_critical": critical,
+                "active_warning": warning,
                 "resolved": total - unresolved,
             }
         finally:

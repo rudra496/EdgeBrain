@@ -4,135 +4,100 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.database import Base, engine
 from app.core.events import event_queue
 from app.core.mqtt_client import mqtt_client
+from app.core.rate_limiter import limiter
+from app.core.metrics import MetricsMiddleware
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
-def _normalize_cors_origins(origins):
-    """Normalize origins from settings into a list FastAPI expects."""
-    if origins is None:
-        return ["*"]
-    if isinstance(origins, str):
-        origins = [o.strip() for o in origins.split(",") if o.strip()]
-    if not origins:
-        return ["*"]
-    return list(origins)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifecycle: startup and shutdown."""
-    # ─── Startup ──────────────────────────────────────────
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)-7s | %(name)-30s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    logger.info("=" * 60)
-    logger.info("  🧠 EdgeBrain v%s — Starting up...", settings.APP_VERSION)
-    logger.info("=" * 60)
-
-    # Create database tables
+    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     Base.metadata.create_all(bind=engine)
-    logger.info("  ✓ Database tables created")
-
-    # Connect MQTT
     mqtt_client.connect()
-    logger.info("  ✓ MQTT client initialized")
-
-    # Initialize Redis event queues
-    try:
-        event_queue.reset()
-        logger.info("  ✓ Event queues initialized")
-    except Exception as e:
-        logger.warning(f"  ⚠ Redis not ready yet: {e}")
-
-    logger.info("=" * 60)
-    logger.info("  🚀 EdgeBrain is running!")
-    logger.info("  📡 API:    http://localhost:%d/docs", settings.API_PORT)
-    logger.info("  🖥️  UI:     http://localhost:3000")
-    logger.info("=" * 60)
-
+    event_queue.connect()
+    logger.info("EdgeBrain started successfully")
     yield
-
-    # ─── Shutdown ─────────────────────────────────────────
     logger.info("Shutting down EdgeBrain...")
     mqtt_client.disconnect()
-    logger.info("Goodbye!")
+    event_queue.close()
+    logger.info("EdgeBrain shutdown complete")
 
 
 app = FastAPI(
-    title="EdgeBrain API",
-    description="""
-    ## 🧠 EdgeBrain — AI-Powered Edge Intelligence Platform
-
-    ### Features
-    - **Real-time sensor data** ingestion and processing
-    - **Multi-agent AI system** (Data → Decision → Action)
-    - **Rule-based** and **statistical anomaly detection**
-    - **Actuator control** via MQTT commands
-    - **WebSocket** for live dashboard updates
-    - **REST API** for programmatic access
-
-    ### Authentication
-    No authentication required (local development mode).
-    """,
+    title=settings.APP_NAME,
     version=settings.APP_VERSION,
     lifespan=lifespan,
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=f"{settings.API_V1_PREFIX}/docs",
+    redoc_url=f"{settings.API_V1_PREFIX}/redoc",
+    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
 )
 
-cors_origins = _normalize_cors_origins(settings.CORS_ORIGINS)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"] ,
-    allow_headers=["*"] ,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
+
+if settings.RATE_LIMIT_ENABLED:
+    app.state.limiter = limiter
+    app.add_middleware(SlowAPIMiddleware)
+
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+        return JSONResponse(
+            status_code=429,
+            content={"error": "Rate limit exceeded", "detail": str(exc.detail)},
+        )
+
+app.add_middleware(MetricsMiddleware)
+app.include_router(router, prefix=settings.API_V1_PREFIX)
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    logger.error(f"Unhandled error: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error"},
+        content={"error": "Internal server error", "detail": str(exc)},
     )
 
 
-app.include_router(router, prefix="/api/v1")
+@app.get(f"{settings.API_V1_PREFIX}/health")
+def health():
+    return {"status": "healthy", "version": settings.APP_VERSION}
 
 
-@app.get("/")
-def root():
+@app.get(f"{settings.API_V1_PREFIX}/info")
+def info():
+    cors_origins = settings.CORS_ORIGINS
     return {
         "name": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "description": "AI-Powered Edge Intelligence Platform",
-        "docs": "/docs",
-        "redoc": "/redoc",
-        "health": "/api/v1/health",
-        "ws": "/api/v1/ws",
-    }
-
-
-@app.get("/api/v1/info")
-def system_info():
-    """Detailed system information."""
-    return {
-        "name": settings.APP_NAME,
-        "version": settings.APP_VERSION,
+        "debug": settings.DEBUG,
+        "api": {
+            "v1_prefix": settings.API_V1_PREFIX,
+            "docs": f"{settings.API_V1_PREFIX}/docs",
+            "redoc": f"{settings.API_V1_PREFIX}/redoc",
+        },
+        "auth": {"enabled": settings.API_ENABLED},
+        "rate_limiting": {
+            "enabled": settings.RATE_LIMIT_ENABLED,
+            "per_minute": settings.RATE_LIMIT_PER_MINUTE,
+            "per_hour": settings.RATE_LIMIT_PER_HOUR,
+        },
         "components": {
-            "backend": "FastAPI + SQLAlchemy",
             "database": "PostgreSQL",
             "cache": "Redis",
             "messaging": "MQTT (Mosquitto)",

@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -6,7 +7,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-# ─── Sensor Data ──────────────────────────────────────────
+# --- Sensor Data ---
 
 
 class SensorReadingOut(BaseModel):
@@ -19,27 +20,48 @@ class SensorReadingOut(BaseModel):
     timestamp: str
 
 
+class ReadingQueryParams(BaseModel):
+    device_id: Optional[str] = None
+    device_type: Optional[str] = None
+    minutes: int = Field(default=60, ge=1, le=10080)
+    limit: int = Field(default=100, ge=1, le=10000)
+
+
+# --- Device ---
+
+
 class DeviceStateOut(BaseModel):
     device_id: str
     device_type: str
-    room: str = "default"
-    is_online: bool
-    last_reading: Optional[float] = None
+    room: str = ""
+    value: float = 0.0
+    unit: str = ""
+    status: str = "online"
     last_seen: Optional[str] = None
-    total_readings: int = 0
+    is_online: bool = True
+    extra: dict = Field(default_factory=dict)
+    updated_at: Optional[str] = None
 
 
-class DeviceStatistics(BaseModel):
+# --- Actuator ---
+
+
+class ActuatorStateOut(BaseModel):
     device_id: str
-    period_minutes: int
-    count: int
-    avg: Optional[float] = None
-    min: Optional[float] = None
-    max: Optional[float] = None
-    stddev: Optional[float] = None
+    actuator_type: str
+    room: str = ""
+    is_active: bool = False
+    last_command: str = ""
+    last_changed: Optional[str] = None
 
 
-# ─── Commands ────────────────────────────────────────────
+# --- Command ---
+
+
+class CommandIn(BaseModel):
+    command: str
+    params: dict = Field(default_factory=dict)
+    source: str = "system"
 
 
 class CommandOut(BaseModel):
@@ -47,104 +69,88 @@ class CommandOut(BaseModel):
     device_id: str
     command: str
     params: dict = Field(default_factory=dict)
-    source: str
-    status: str
-    response: Optional[str] = None
+    source: str = "system"
+    status: str = "sent"
     timestamp: str
 
 
-class CommandIn(BaseModel):
-    command: str = Field(..., description="activate or deactivate")
-    params: dict = Field(default_factory=dict, description="e.g. {'actuator': 'fan'}")
-
-
-class ActuatorStateOut(BaseModel):
-    device_id: str
-    actuator_type: str
-    room: str = "default"
-    is_active: bool
-    last_command: Optional[str] = None
-    last_changed: Optional[str] = None
-
-
-# ─── Alerts ──────────────────────────────────────────────
+# --- Alert ---
 
 
 class AlertOut(BaseModel):
     id: str
     device_id: str
-    alert_type: str
+    device_type: str
     severity: str
     message: str
-    data: dict = Field(default_factory=dict)
-    resolved: bool
+    value: float = 0.0
+    threshold: float = 0.0
+    acknowledged: bool = False
+    acknowledged_at: Optional[str] = None
+    acknowledged_by: Optional[str] = None
+    resolved: bool = False
     resolved_at: Optional[str] = None
+    resolved_by: Optional[str] = None
+    resolution_note: Optional[str] = None
     timestamp: str
 
 
-class AlertSummary(BaseModel):
-    total: int
-    unresolved: int
-    critical_unresolved: int
-    resolved: int
+class AlertAcknowledge(BaseModel):
+    acknowledged_by: str = Field(..., min_length=1, max_length=100)
 
 
-# ─── Agents ──────────────────────────────────────────────
+class AlertResolve(BaseModel):
+    resolved_by: str = Field(..., min_length=1, max_length=100)
+    resolution_note: Optional[str] = Field(default=None, max_length=1000)
 
 
-class AgentMessageOut(BaseModel):
-    id: str
-    sender: str
-    target: str
-    type: str
-    data: dict
-    timestamp: str
-
-
-class AgentStats(BaseModel):
-    readings_processed: int
-    messages_in_bus: int
-    engine: dict
-    agent_performance: dict
-
-
-# ─── Prediction ──────────────────────────────────────────
+# --- Prediction ---
 
 
 class PredictionOut(BaseModel):
-    value: float
-    confidence: float
-    method: str
-    horizon: int
-    details: dict
+    device_id: str
+    current_value: float
+    anomaly_score: float
+    predictions: dict
+    moving_averages: dict
 
 
-# ─── System ──────────────────────────────────────────────
+# --- Stats ---
 
 
-class HealthCheck(BaseModel):
-    status: str
-    timestamp: str
-    mqtt_connected: bool
+class DeviceStatisticsOut(BaseModel):
+    device_id: str
+    minutes: int
+    count: int
+    mean: float
+    std: float
+    min: float
+    max: float
+    latest: float
 
 
-class SystemStats(BaseModel):
-    alerts: dict
-    agents: dict
-    ingestion: dict
-    events: dict
-    mqtt_connected: bool
-    timestamp: str
+class SystemStatsOut(BaseModel):
+    total_devices: int
+    online_devices: int
+    offline_devices: int
+    total_readings: int
+    total_alerts: int
+    total_commands: int
+    uptime_seconds: float
 
 
-class SystemInfo(BaseModel):
-    name: str
-    version: str
-    components: dict
-    mqtt_status: str
+# --- Heartbeat ---
 
 
-# ─── Generic ─────────────────────────────────────────────
+class HeartbeatOut(BaseModel):
+    total_devices: int
+    online: int
+    offline: int
+    heartbeat_timeout_s: int
+    offline_devices: list[dict] = Field(default_factory=list)
+
+
+# --- Generic ---
 
 
 class MessageResponse(BaseModel):
