@@ -23,6 +23,7 @@ os.environ.setdefault("MQTT_PORT", "1883")
 sys.modules.setdefault("psycopg2", MagicMock())
 sys.modules.setdefault("asyncpg", MagicMock())
 
+import app.core.database
 from fastapi.testclient import TestClient
 
 
