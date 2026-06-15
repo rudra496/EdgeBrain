@@ -39,6 +39,7 @@ from app.core.metrics import get_metrics, get_metrics_content_type
 from app.services.ingestion import data_ingestion
 from app.services.execution import execution_service, alert_service
 from app.ai.prediction import predictor
+from app.agents.multi_agent import agents
 
 logger = logging.getLogger(__name__)
 
@@ -336,6 +337,38 @@ def get_prometheus_metrics():
 def get_auth_stats(key_info: dict = Depends(verify_admin_access)):
     """Get API key usage statistics (admin only)."""
     return auth_service.get_stats()
+
+
+# ═══════════════════════════════════════════════════════════
+# Agent Endpoints
+# ═══════════════════════════════════════════════════════════
+
+
+@router.get("/agents/messages")
+def get_agent_messages(
+    limit: int = Query(default=50, ge=1, le=200),
+    agent: Optional[str] = None,
+    key_info: dict = Depends(verify_api_key),
+):
+    """Get recent agent messages."""
+    return agents.get_messages(limit, agent)
+
+
+@router.get("/agents/stats")
+def get_agent_stats(key_info: dict = Depends(verify_api_key)):
+    """Get system-wide agent statistics."""
+    return agents.get_stats()
+
+
+@router.get("/agents/strategies")
+def get_strategies(key_info: dict = Depends(verify_api_key)):
+    """List loaded AI strategies."""
+    return {
+        "strategies": [
+            {"name": s.name, "type": s.__class__.__name__}
+            for s in agents.engine.strategies
+        ]
+    }
 
 
 # ═══════════════════════════════════════════════════════════
