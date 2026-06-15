@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 os.environ.setdefault("DATABASE_URL", "sqlite:///test.db")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("MQTT_HOST", "localhost")
+os.environ["API_ENABLED"] = "false"
+os.environ["RATE_LIMIT_ENABLED"] = "false"
 os.environ.setdefault("MQTT_PORT", "1883")
 
 # Mock psycopg2 before sqlalchemy tries to import it
@@ -35,6 +37,8 @@ PATCH_AGENTS = "app.api.routes.agents"
 PATCH_MQTT = "app.api.routes.mqtt_client"
 PATCH_EVENT_QUEUE = "app.api.routes.event_queue"
 PATCH_PREDICTOR = "app.api.routes.predictor"
+PATCH_HEARTBEAT = "app.api.routes.device_heartbeat"
+PATCH_AUTH_SERVICE = "app.api.routes.auth_service"
 
 mock_mqtt = MagicMock()
 mock_mqtt.is_connected = False
@@ -174,6 +178,22 @@ def mock_services():
 
     mock_eq.get_stats.return_value = {"total_alerts": 5, "total_events": 50}
 
+    mock_heartbeat = MagicMock()
+    mock_heartbeat.get_stats.return_value = {
+        "total_devices": 2, "online": 2, "offline": 0,
+        "heartbeat_timeout_s": 60,
+    }
+    mock_heartbeat.get_offline_devices.return_value = []
+    mock_heartbeat.get_online_devices.return_value = [
+        {"device_id": "room-1-sensor-temp", "last_seen": datetime.now(timezone.utc).isoformat()},
+        {"device_id": "room-1-actuator-fan", "last_seen": datetime.now(timezone.utc).isoformat()},
+    ]
+
+    mock_auth = MagicMock()
+    mock_auth.get_stats.return_value = {
+        "total_keys": 3, "active_keys": 2, "requests_by_key": {},
+    }
+
     with (
         patch(PATCH_INGESTION, mock_ing),
         patch(PATCH_EXECUTION, mock_exec),
@@ -181,6 +201,8 @@ def mock_services():
         patch(PATCH_AGENTS, mock_ag),
         patch(PATCH_MQTT, mock_mqtt),
         patch(PATCH_EVENT_QUEUE, mock_eq),
+        patch(PATCH_HEARTBEAT, mock_heartbeat),
+        patch(PATCH_AUTH_SERVICE, mock_auth),
     ):
         yield {
             "ingestion": mock_ing,
@@ -188,6 +210,8 @@ def mock_services():
             "alert": mock_alert_svc,
             "agents": mock_ag,
             "event_queue": mock_eq,
+            "heartbeat": mock_heartbeat,
+            "auth": mock_auth,
         }
 
 
