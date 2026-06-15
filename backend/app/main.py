@@ -24,12 +24,10 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     Base.metadata.create_all(bind=engine)
     mqtt_client.connect()
-    event_queue.connect()
     logger.info("EdgeBrain started successfully")
     yield
     logger.info("Shutting down EdgeBrain...")
     mqtt_client.disconnect()
-    event_queue.close()
     logger.info("EdgeBrain shutdown complete")
 
 
