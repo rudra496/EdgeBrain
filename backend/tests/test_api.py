@@ -120,7 +120,7 @@ def mock_services():
     mock_ag = MagicMock()
     mock_eq = MagicMock()
 
-    mock_ing.get_all_device_states.return_value = [
+    mock_ing.get_all_devices.return_value = [
         _make_device_state("room-1-sensor-temp", "temperature"),
         _make_device_state("room-1-sensor-motion", "motion"),
     ]
