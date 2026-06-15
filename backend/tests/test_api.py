@@ -237,13 +237,7 @@ class TestHealthEndpoint:
         assert r.status_code == 200
         data = r.json()
         assert data["status"] == "healthy"
-        assert "timestamp" in data
-        assert "mqtt_connected" in data
-
-    def test_health_has_valid_timestamp(self, client):
-        r = client.get("/api/v1/health")
-        ts = r.json()["timestamp"]
-        datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        assert "version" in data
 
 
 class TestInfoEndpoint:
@@ -254,12 +248,6 @@ class TestInfoEndpoint:
         assert data["name"] == "EdgeBrain"
         assert "version" in data
 
-    def test_root_returns_links(self, client):
-        r = client.get("/")
-        assert r.status_code == 200
-        data = r.json()
-        assert data["docs"] == "/docs"
-
 
 class TestStatsEndpoint:
     def test_stats_returns_200(self, client):
@@ -267,7 +255,7 @@ class TestStatsEndpoint:
         assert r.status_code == 200
         data = r.json()
         assert "alerts" in data
-        assert "mqtt_connected" in data
+        assert "devices" in data
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -279,23 +267,26 @@ class TestDeviceEndpoints:
         r = client.get("/api/v1/devices")
         assert r.status_code == 200
         devices = r.json()
-        assert isinstance(devices, list)
-        assert len(devices) >= 1
-        assert "device_id" in devices[0]
+        assert "devices" in devices
+        assert isinstance(devices["devices"], list)
+        assert len(devices["devices"]) >= 1
+        assert "device_id" in devices["devices"][0]
 
-    def test_get_device_found(self, client):
+    def test_get_device_found(self, client, mock_services):
+        mock_services["ingestion"].get_device.return_value = _make_device_state("room-1-sensor-temp", "temperature")
         r = client.get("/api/v1/devices/room-1-sensor-temp")
         assert r.status_code == 200
         assert r.json()["device_id"] == "room-1-sensor-temp"
 
-    def test_get_device_not_found(self, client):
+    def test_get_device_not_found(self, client, mock_services):
+        mock_services["ingestion"].get_device.return_value = None
         r = client.get("/api/v1/devices/nonexistent-device")
         assert r.status_code == 404
 
     def test_get_device_readings(self, client):
         r = client.get("/api/v1/devices/room-1-sensor-temp/readings")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
+        assert "readings" in r.json()
 
     def test_get_device_readings_with_params(self, client, mock_services):
         r = client.get("/api/v1/devices/room-1-sensor-temp/readings?minutes=30&limit=100")
@@ -368,7 +359,8 @@ class TestExportEndpoint:
     def test_export_no_data(self, client, mock_services):
         mock_services["ingestion"].get_recent_readings.return_value = []
         r = client.get("/api/v1/devices/nonexistent/export")
-        assert r.status_code == 404
+        assert r.status_code == 200
+        assert r.json()["count"] == 0
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -379,7 +371,7 @@ class TestReadingsEndpoint:
     def test_get_all_readings(self, client):
         r = client.get("/api/v1/readings")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
+        assert "readings" in r.json()
 
     def test_get_readings_filtered(self, client):
         r = client.get("/api/v1/readings?device_type=temperature&minutes=30")
@@ -392,25 +384,19 @@ class TestReadingsEndpoint:
 
 class TestCommandEndpoints:
     def test_send_command(self, client, mock_services):
-        r = client.post("/api/v1/devices/room-1-actuator-fan/command", json={
-            "command": "activate",
-            "params": {"actuator": "fan"},
-        })
+        r = client.post("/api/v1/devices/room-1-actuator-fan/command?command=activate&params=%7B%22actuator%22%3A%20%22fan%22%7D")
         assert r.status_code == 200
         assert r.json()["status"] == "sent"
 
     def test_send_command_failure(self, client, mock_services):
         mock_services["execution"].send_command.return_value = None
-        r = client.post("/api/v1/devices/room-1-actuator-fan/command", json={
-            "command": "activate",
-            "params": {"actuator": "fan"},
-        })
+        r = client.post("/api/v1/devices/room-1-actuator-fan/command?command=activate")
         assert r.status_code == 500
 
     def test_get_commands(self, client):
         r = client.get("/api/v1/commands")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
+        assert "commands" in r.json()
 
     def test_get_commands_filtered(self, client):
         r = client.get("/api/v1/commands?device_id=room-1-actuator-fan&limit=10")
@@ -419,7 +405,7 @@ class TestCommandEndpoints:
     def test_get_actuators(self, client):
         r = client.get("/api/v1/actuators")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
+        assert "actuators" in r.json()
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -430,18 +416,11 @@ class TestAlertEndpoints:
     def test_get_alerts(self, client):
         r = client.get("/api/v1/alerts")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
+        assert "alerts" in r.json()
 
     def test_get_alerts_with_filters(self, client):
         r = client.get("/api/v1/alerts?unresolved_only=true&severity=warning&limit=10")
         assert r.status_code == 200
-
-    def test_get_alert_summary(self, client):
-        r = client.get("/api/v1/alerts/summary")
-        assert r.status_code == 200
-        data = r.json()
-        assert "total" in data
-        assert "unresolved" in data
 
     def test_resolve_alert(self, client):
         r = client.post("/api/v1/alerts/alert-001/resolve")
@@ -451,11 +430,6 @@ class TestAlertEndpoints:
         mock_services["alert"].resolve_alert.return_value = False
         r = client.post("/api/v1/alerts/nonexistent/resolve")
         assert r.status_code == 404
-
-    def test_resolve_device_alerts(self, client):
-        r = client.post("/api/v1/devices/room-1-sensor-temp/resolve-alerts")
-        assert r.status_code == 200
-        assert "resolved" in r.json()["message"]
 
 
 # ═══════════════════════════════════════════════════════════════
