@@ -22,7 +22,7 @@ jobs:
         ports: ["6379:6379"]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with: { python-version: "3.11", cache: pip, cache-dependency-path: backend/requirements.txt }
       - name: Install deps
         run: pip install -r backend/requirements.txt
