@@ -10,7 +10,7 @@
 
 <div align="center">
 
-<img src="https://img.shields.io/badge/EdgeBrain-v1.0.0-818cf8?style=for-the-badge&label=VERSION" alt="Version">
+<img src="https://img.shields.io/badge/EdgeBrain-v1.1.0-818cf8?style=for-the-badge&label=VERSION" alt="Version">
 
 <br /><br />
 
@@ -18,6 +18,7 @@
 
 **Simulate → Process → Decide → Act — all locally, all free.**
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22118683.svg)](https://doi.org/10.5281/zenodo.22118683)
 [![CI](https://img.shields.io/github/actions/workflow/status/rudra496/EdgeBrain/ci.yml?branch=master&style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/actions)
 [![Release](https://img.shields.io/github/v/release/rudra496/EdgeBrain?style=flat-square&logo=github)](https://github.com/rudra496/EdgeBrain/releases/latest)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
