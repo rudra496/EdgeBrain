@@ -1,13 +1,22 @@
 cff-version: 1.2.0
-title: "EdgeBrain — Lightweight Edge AI Inference Engine"
-message: "If you use this software, please cite it as below."
-type: software
+message: "If you use EdgeBrain or reference its edge AI inference benchmarks, please cite it as below."
+title: "EdgeBrain: Lightweight Edge AI Inference Engine & Embedded Machine Learning Platform"
 authors:
-  - given-names: Rudra
-    family-names: Sarker
+  - family-names: "Sarker"
+    given-names: "Rudra"
     affiliation: "Shahjalal University of Science and Technology, Bangladesh"
     orcid: "https://orcid.org/0009-0001-4545-0932"
+doi: "10.5281/zenodo.22118683"
+abstract: "EdgeBrain is an open-source edge artificial intelligence inference engine and embedded machine learning platform capable of sub-100ms local execution without cloud reliance or external API keys."
+version: "1.1.0"
+date-released: "2026-08-26"
+license: "MIT"
 repository-code: "https://github.com/rudra496/EdgeBrain"
-url: "https://github.com/rudra496/EdgeBrain"
-abstract: "Run ML models locally with sub-100ms latency. No cloud. No API keys."
-license: MIT
+url: "https://rudra496.github.io/EdgeBrain/"
+keywords:
+  - "edge-ai"
+  - "embedded-systems"
+  - "tinyml"
+  - "iot"
+  - "machine-learning"
+  - "open-source"
